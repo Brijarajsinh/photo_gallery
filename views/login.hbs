@@ -1,0 +1,28 @@
+<div class="sufee-login d-flex align-content-center flex-wrap">
+    <div class="container">
+        <div class="login-content">
+            <div class="login-form">
+                <h2 class="h2 text-center mb-4">Photo Gallery Affiliate Marketing</h2>
+                {{#if flash}}
+                <div class="alert alert-danger ">{{flash.message}}</div>
+                {{/if}}
+                <form id="login-form" method="post" action="/user/login">
+                    <div class="form-group">
+                        <label>Email address</label>
+                        <input type="email" class="form-control login-email" placeholder="abc@gmail.com" name="email">
+                    </div>
+                    <div class="form-group">
+                        <label>Password</label>
+                        <input type="password" class="form-control login-pswd" placeholder="Type Your password"
+                            name="pswd">
+                    </div>
+                    <button type="submit" class="btn btn-success btn-flat m-b-30 m-t-30" id="btn-login">Log In</button>
+                    <div class="mt-1 register-link m-t-15 text-center">
+                        <p>Don't have account ? <a href="/sign-up">Sign-Up</a></p>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="/javascripts/user/login.js"></script>
