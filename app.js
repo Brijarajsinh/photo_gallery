@@ -5,15 +5,18 @@ const path = require('path');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 const exHbs = require('express-handlebars');
+const helpers = require('handlebars-helpers')();
+
 
 //requiring nocache package to restrict user from accessing previous page of browser
 const nocache = require("nocache");
 
-//requiring route to hadle requests
+//requiring route to handle requests
 const indexRouter = require('./routes/index');
 const userRouter = require('./routes/users');
 const dashboardRouter = require('./routes/dashboard');
-
+const settingRouter = require('./routes/settings');
+const userListRouter = require('./routes/userList');
 //Requiring Flash
 const flash = require('connect-flash');
 
@@ -28,9 +31,12 @@ const app = express();
 
 //default layout set to application
 const hbs = exHbs.create({
-  extname: '.hbs'
+  extname: '.hbs',
+  defaultLayout: 'main',
+  helpers: {
+    ...helpers
+  }
 });
-
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -80,6 +86,8 @@ app.use(auth.commonMiddleware);
 //dashboard page 
 //this page is only accessible after login
 app.use('/dashboard', dashboardRouter);
+app.use('/settings', settingRouter);
+app.use('/userList', userListRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

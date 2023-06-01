@@ -1,0 +1,65 @@
+<div class="breadcrumbs">
+    <div class="col-sm-4">
+        <div class="page-header float-left">
+            <div class="page-title">
+                <h1>Dashboard</h1>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-8">
+        <div class="page-header float-right">
+            <div class="page-title">
+                <ol class="breadcrumb text-right">
+                    <li><a href="javascript:void(0);">Dashboard</a></li>
+                    <li><a href="javascript:void(0);">Settings</a></li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="card card-md">
+    <div class="card-body">
+        <h3 class="card-title text-center">Edit general Settings</h3><br>
+        <form id="edit-setting-form">
+            <b>
+                <div class="row">
+                    <div class="col-6">
+                        <div class="mb-3">
+                            <label class="form-label">Welcome Bonus to new Registered users<sup
+                                    class="text-danger">*</sup></label>
+
+                            <input type="number" class="form-control" name="welcomeBonus" id="welcomeBonus" min="0"
+                                value="{{currentDetails.welcomeBonus}}" max="1000">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Referral Bonus to user for referring to other new users<sup
+                                    class="text-danger">*</sup></label>
+                            <input type="number" class="form-control" name="referralBonus" id="referralBonus" min="0"
+                                value="{{currentDetails.referralBonus}}" max="1000">
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="mb-3">
+                            <label class="form-label">Charge Deduction Per Image Upload<sup
+                                    class="text-danger">*</sup></label>
+                            <input type="number" class="form-control" name="chargePerImage" id="chargePerImage" min="0"
+                                value="{{currentDetails.chargePerImage}}" max="100">
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Maximum Refer to new user<sup class="text-danger">*</sup></label>
+                            <input type="number" class="form-control" name="maxRefer" id="maxRefer"
+                                value="{{currentDetails.maxRefer}}" min="0" max="10">
+                        </div>
+                    </div>
+                </div>
+                <div class="form-footer" style="float: right;">
+                    <button type="submit" id="btn-apply" class="btn btn-primary" name="apply">Apply
+                        Changes</button>
+                </div>
+            </b>
+        </form>
+    </div>
+</div>
+
+<script src="/javascripts/admin/settingUpdate.js"></script>

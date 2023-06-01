@@ -1,4 +1,4 @@
-$(document).ready(function () {
+$(function () {
 
     //add jquery validator method to validate password field is strong enough or not
     $.validator.addMethod("strongPassword", function (value) {

@@ -1,0 +1,71 @@
+<div class="breadcrumbs">
+    <div class="col-sm-4">
+        <div class="page-header float-left">
+            <div class="page-title">
+                <h1>Dashboard</h1>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-8">
+        <div class="page-header float-right">
+            <div class="page-title">
+                <ol class="breadcrumb text-right">
+                    <li><a href="javascript:void(0);">Dashboard</a></li>
+                    <li><a href="javascript:void(0);">Userlist</a></li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="card card-md">
+    <div class="card-body">
+        <b>
+            <div class="content mt-3">
+                <div class="animated fadeIn">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="card">
+                                <div class="card-header">
+                                    <strong class="card-title">Users of Photo Gallery</strong>
+                                    <input type="text" class="search-user float-right" placeholder="Search user by name">
+                                </div>
+                                <div class="card-body">
+                                    <table id="bootstrap-data-table-export" class="table table-striped table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <th>Name</th>
+                                                <th>E-mail</th>
+                                                <th>Available Coins</th>
+                                                <th>Referred other users</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {{#each users}}
+                                            <tr>
+                                                <td>{{fullName}}</td>
+                                                <td>{{email}}</td>
+                                                <td>{{availableCoins}}</td>
+                                                <td>{{referralUsers}}</td>
+                                            </tr>
+                                            {{/each}}
+
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div><!-- .animated -->
+            </div><!-- .content -->
+        </b>
+    </div>
+</div>
+<nav aria-label="Page navigation example">
+    <ul class="pagination justify-content-center">
+        {{#each page}}
+        <li class="page-item"><a class="page-link user-wise" href="javascript:void(0);" data-page={{this}}>{{this}}</a>
+        </li>
+        {{/each}}
+    </ul>
+</nav>
+<script src="/javascripts/admin/userList.js"></script>

@@ -3,7 +3,6 @@ const functionUsage = require('../helpers/function');
 const passport = require('passport');
 const referralBonusService = require('../services/user.services');
 exports.registration = async (req, res, next) => {
-
     try {
         const userDetails = req.body;
         const exist = await userModel.countDocuments({ email: userDetails.email, role: 'user' });
@@ -116,3 +115,11 @@ exports.checkEmail = async (req, res) => {
     //else return true
     return res.send(true);
 }
+
+//this function checks role of logged in user and according to role allow functionalities
+exports.redirectToDashboard = async (req, res) => {
+        res.render('dashboard', {
+            title: 'Dashboard'
+        });
+   
+};

@@ -48,6 +48,7 @@ module.exports = {
                     "password": hashConversion.generatePasswordHash(pswd)
                 }, {
                     _id: 1,
+                    role:1,
                     fname: 1,
                     lname: 1,
                     gender: 1,

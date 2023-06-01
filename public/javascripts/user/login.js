@@ -1,4 +1,4 @@
-$(document).ready(function () {
+$(function () {
     //login-form is validate using jquery validator method
     $("#login-form").validate({
         keypress: true,
@@ -30,7 +30,7 @@ $(document).ready(function () {
         },
         //if error generates by jquery validator
         errorPlacement: function (error, element) {
-                error.insertAfter(element);
+            error.insertAfter(element);
         },
         //on submit of login-form submit the form to the action with method post
         submitHandler: function (form) {
