@@ -80,5 +80,24 @@ module.exports = {
     referralCount: async function () {
         const referralCount = await settingModel.findOne({}, { "maxRefer": 1, "_id": 0 });
         return referralCount.maxRefer;
+    },
+
+    //check admin function allows only admins to access functionality of admin role
+    checkAdmin:async function(req,res,next){
+        if(req.user.role == 'admin'){
+            return next();
+        }
+        return res.redirect('/dashboard');
+    
+        
+    },
+
+    //check user function allows only users to access functionality of user role
+
+    checkUser:async function(req,res,next){
+        if(req.user.role == 'user'){
+            return next();
+        }
+        return res.redirect('/dashboard');
     }
 }

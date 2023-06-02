@@ -12,7 +12,7 @@ $(function () {
     };
 
     //if admin searches than ajax request is called with search parameter in query string
-    $(".search-user").on('input', function () {
+    $(".search-user").on('click', function () {
         $.ajax({
             type: "get",
             url: getUrl(),
@@ -24,20 +24,19 @@ $(function () {
             }
         });
     });
-
+    
     //when user moves to another page than ajax called 
     //with that selected page value as page parameter in ajax request query string
     $(".user-wise").on('click', function () {
         // $(document).bind('click', '.user-wise', function () {
         const page = $(this).data("page");
         let url = getUrl();
-        url += `page=${page}`;
+        url += `page=${page}&`;
         $.ajax({
             type: "get",
             url: url,
             success: function (res) {
                 $("#main").html(res);
-
             },
             error: function (err) {
                 console.log(err.toString());
@@ -45,12 +44,11 @@ $(function () {
         });
     });
     $(".clear-search").on('click', function () {
-
         // $(document).on('click', '.clear-search', function () {
         $(".search").val("");
         $.ajax({
             type: "get",
-            url: getUrl(),
+            url: '/userList?',
             success: function (res) {
                 $("#main").html(res);
             },
@@ -58,5 +56,33 @@ $(function () {
                 console.log(err.toString());
             }
         });
-    })
+    });
+
+
+    //sorting user list based on admin selection
+    $(".sort").on('click', function () {
+        let url = getUrl();
+        const sort = $(this).attr(`value`);
+        const sortOrder = $(this).attr(`data-flag`);
+        url += `sort=${sort}&sortOrder=${sortOrder}`;
+        $.ajax({
+            type: "get",
+            url: url,
+            success: function (res) {
+                $("#main").html(res);
+                if (sortOrder == '1') $(`#${sort}`).attr('data-flag', '-1');
+                else $(`#${sort}`).attr('data-flag', '1');
+            },
+            error: function (err) {
+                console.log(err.toString());
+            }
+        });
+        // if (sortOrder) {
+        //     // console.log($(`#${sort}`).data('flag'));
+        //     $(`#${sort}`).data('flag', '-1');
+        // }
+        // else {
+        //     $(`#${sort}`).data('flag', '1');
+        // }
+    });
 });

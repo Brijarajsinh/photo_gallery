@@ -50,8 +50,9 @@ exports.getUserList = async (req, res, next) => {
         const find = {
             role: "user"
         };
+        const sort = {};
         const pageSkip = (Number(req.query.page)) ? Number(req.query.page) : 1;
-        const limit = 3;
+        const limit = 10;
         const skip = (pageSkip - 1) * limit;
 
         //if req.query.search consists value than searching applied parameter applies to fetch records from Database
@@ -74,6 +75,13 @@ exports.getUserList = async (req, res, next) => {
                 }
             ]
         }
+
+        if (req.query.sort) {
+            sort[req.query.sort] = req.query.sortOrder
+        }
+        else {
+            sort._id = 1
+        }
         const currentUsers = await userModel.find(
             find
             , {
@@ -82,8 +90,7 @@ exports.getUserList = async (req, res, next) => {
                 "email": 1,
                 "availableCoins": 1,
                 "referralUsers": 1,
-            }).skip(skip).limit(limit).lean();
-
+            }).sort(sort).skip(skip).limit(limit).lean();
 
         //find total count of users
         const totalUsers = await userModel.countDocuments(
@@ -100,6 +107,7 @@ exports.getUserList = async (req, res, next) => {
 
         //if this route is called using ajax request than load data through partials
         if (req.xhr) {
+
             //render userList page to display list of users
             res.render('admin/userList', {
                 title: 'Users',

@@ -118,8 +118,14 @@ exports.checkEmail = async (req, res) => {
 
 //this function checks role of logged in user and according to role allow functionalities
 exports.redirectToDashboard = async (req, res) => {
+    if (req.user.role == 'admin') {
         res.render('dashboard', {
             title: 'Dashboard'
         });
-   
+    }
+    else {
+        res.render('landing', {
+            title: 'Dashboard'
+        });
+    }
 };

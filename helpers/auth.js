@@ -54,7 +54,9 @@ module.exports = {
                     gender: 1,
                     password: 1,
                     email: 1,
-                    fullName: 1
+                    fullName: 1,
+                    referLink:1,
+                    availableCoins:1
                 }).lean().then(async function (user) {
                     // if user not found
                     if (!user) {
