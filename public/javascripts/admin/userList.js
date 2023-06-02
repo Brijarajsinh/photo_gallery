@@ -1,8 +1,9 @@
 $(function () {
 
+    //getUrl function creates url to call route with query parameters of search and page number
     function getUrl() {
         let url = '/userList?'
-        const search = $(".search-user").val();
+        const search = $(".search").val().trim();
         //if logged-in user search other user by first name, last name and full name than that search value is passed in query parameter 
         if (search) {
             url += `search=${search}&`
@@ -10,24 +11,24 @@ $(function () {
         return url;
     };
 
-    //if admin searches than ajax request is called with search parameter as url
+    //if admin searches than ajax request is called with search parameter in query string
     $(".search-user").on('input', function () {
         $.ajax({
             type: "get",
-            url:getURL(),
+            url: getUrl(),
             success: function (res) {
-                //if response type of ajax request is success than shows only fetched user-details
-                $("#report").html(res);
+                $("#main").html(res);
             },
             error: function (err) {
                 console.log(err.toString());
             }
-        })
+        });
     });
 
     //when user moves to another page than ajax called 
     //with that selected page value as page parameter in ajax request query string
-    $(document).on('click', '.user-wise', function () {
+    $(".user-wise").on('click', function () {
+        // $(document).bind('click', '.user-wise', function () {
         const page = $(this).data("page");
         let url = getUrl();
         url += `page=${page}`;
@@ -35,12 +36,27 @@ $(function () {
             type: "get",
             url: url,
             success: function (res) {
-                //displays fetched records to the user
-                $("#report").html(res);
+                $("#main").html(res);
+
             },
             error: function (err) {
                 console.log(err.toString());
             }
-        })
+        });
     });
+    $(".clear-search").on('click', function () {
+
+        // $(document).on('click', '.clear-search', function () {
+        $(".search").val("");
+        $.ajax({
+            type: "get",
+            url: getUrl(),
+            success: function (res) {
+                $("#main").html(res);
+            },
+            error: function (err) {
+                console.log(err.toString());
+            }
+        });
+    })
 });

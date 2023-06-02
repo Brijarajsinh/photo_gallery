@@ -46,6 +46,7 @@ exports.updateGeneralSettings = async (req, res, next) => {
 exports.getUserList = async (req, res, next) => {
 
     try {
+
         const find = {
             role: "user"
         };
@@ -73,8 +74,6 @@ exports.getUserList = async (req, res, next) => {
                 }
             ]
         }
-
-
         const currentUsers = await userModel.find(
             find
             , {
@@ -97,14 +96,28 @@ exports.getUserList = async (req, res, next) => {
         for (let i = 1; i <= pageCount; i++) {
             page.push(i);
         }
-        console.log("USERS");
-        console.log(currentUsers);
-        //render userList page to display list of users
-        res.render('admin/userList', {
-            title: 'Users',
-            users: currentUsers,
-            page: page
-        });
+
+
+        //if this route is called using ajax request than load data through partials
+        if (req.xhr) {
+            //render userList page to display list of users
+            res.render('admin/userList', {
+                title: 'Users',
+                users: currentUsers,
+                page: page,
+                layout: 'blank',
+                searchValue: req.query.search
+            });
+        }
+        //otherwise load data through rendering report page
+        else {
+            //render userList page to display list of users
+            res.render('admin/userList', {
+                title: 'Users',
+                users: currentUsers,
+                page: page
+            });
+        }
     } catch (error) {
         console.log("Error Generated While Admin access userList Page");
         console.log(error);

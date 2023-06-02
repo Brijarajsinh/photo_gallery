@@ -61,8 +61,8 @@ $(function () {
             $.ajax({
                 /**
                  * after validating user entered details,
-                 * ajax request of put type is called to update user entered details in db and 
-                 * success response of ajax request set the updated details of post
+                 * ajax request of post type is called to update admin entered details in general-setting collection and 
+                 * success response of ajax request set the updated details of general settings with toastr successful message
                  */
                 type: 'post',
                 url: '/settings',
