@@ -46,7 +46,6 @@ exports.updateGeneralSettings = async (req, res, next) => {
 exports.getUserList = async (req, res, next) => {
 
     try {
-
         const find = {
             role: "user"
         };

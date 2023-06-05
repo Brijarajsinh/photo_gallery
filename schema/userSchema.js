@@ -1,5 +1,7 @@
 //requiring mongoose  
 const { default: mongoose } = require("mongoose");
+const transactionModel = require('../schema/transactions');
+
 
 //creating option object for timestamp fields in collection
 const option = {
@@ -43,15 +45,15 @@ const userSchema = new mongoose.Schema({
     },
     availableCoins: {
         type: Number,
-        default:0
+        default: 0
     },
-    referralUsers:{
-        type:Number,
-        default:0
+    referralUsers: {
+        type: Number,
+        default: 0
     },
-    referLink:{
-        type:String,
-        default:null
+    referLink: {
+        type: String,
+        default: null
     }
 }, option);
 
@@ -62,6 +64,22 @@ userSchema.pre('save', async function (next) {
     this.fullName = full_name;
     next();
 });
+
+
+//post hook will be executed after save any user's details in users collection
+userSchema.post('save', async function (next) {
+    //this function enter transaction of welcome bonus of user
+    const transaction = await new transactionModel({
+        'user_id': `${this._id}`,
+        'balance': `${this.availableCoins}`,
+        'amount': `${this.availableCoins}`
+    });
+    await transaction.save();
+    next();
+});
+
+
+
 
 const UserModel = mongoose.model('users', userSchema);
 module.exports = UserModel;

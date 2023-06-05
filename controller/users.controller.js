@@ -2,6 +2,7 @@ const userModel = require('../schema/userSchema');
 const functionUsage = require('../helpers/function');
 const passport = require('passport');
 const referralBonusService = require('../services/user.services');
+const transactionModel = require('../schema/transactions');
 exports.registration = async (req, res, next) => {
     try {
         const userDetails = req.body;
@@ -45,7 +46,15 @@ exports.registration = async (req, res, next) => {
                         //if user entered referral code is valid and limit of referring user is applicable
                         // than that referred user will get extra referral bonus via referBonus service
                         await referralBonusService.referralBonus(referral._id);
-
+                        const transactionDetails = await transactionModel.findOne({ "referLink": user.referLink });
+                        console.log("TRANSACTIONS:____------> ");
+                        console.log(transactionDetails);
+                        // const transaction = await new transactionModel({
+                        //     'user_id': `${_id}`,
+                        //     'balance': `${this.availableCoins}`,
+                        //     'amount': `${this.availableCoins}`
+                        // });
+                        // await transaction.save();
                     }
                 }
                 res.send({
@@ -88,11 +97,13 @@ exports.login = async (req, res) => {
 
 //signUp controller render sign-up page to the user
 exports.signUp = async (req, res) => {
+    await _isLoggedIn(req, res);
     res.render('sign-up', { title: 'Registration Page', layout: 'beforeLogin' })
 }
 
 //loginPage Controller render login page to the user
 exports.loginPage = async (req, res) => {
+    await _isLoggedIn(req, res);
     res.render('login', { title: 'Login Page', layout: 'beforeLogin' });
 }
 
@@ -129,3 +140,9 @@ exports.redirectToDashboard = async (req, res) => {
         });
     }
 };
+
+function _isLoggedIn(req, res, next) {
+    if (req.user) {
+        return res.redirect('/dashboard');
+    }
+}

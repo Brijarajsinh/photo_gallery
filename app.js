@@ -89,7 +89,7 @@ app.use(auth.commonMiddleware);
 //this page is only accessible after login
 app.use('/dashboard', dashboardRouter);
 app.use('/settings', settingRouter);
-app.use('/userList', userListRouter);
+app.use('/user-list', userListRouter);
 
 // app.use('/gallery', galleryRouter);
 // app.use('/transaction', transactionRouter);
