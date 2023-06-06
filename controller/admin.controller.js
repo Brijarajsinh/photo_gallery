@@ -1,6 +1,6 @@
 const settingModel = require('../schema/generalSettings');
 const userModel = require('../schema/userSchema');
-
+const { applySettings } = require('../helpers/function');
 //this controller fetches current general-settings
 exports.getGeneralSettings = async (req, res, next) => {
     try {
@@ -26,12 +26,13 @@ exports.getGeneralSettings = async (req, res, next) => {
 //this controller updates general setting in database
 exports.updateGeneralSettings = async (req, res, next) => {
     try {
-        await settingModel.updateOne({},
-            req.body
-        )
+
+        const settings = await applySettings(req.body);
+        await settingModel.updateOne({}, { $set: settings }, { upsert: true });
         res.send({
             type: 'success'
         });
+
     } catch (error) {
         console.log("Error Generated While Updating General Settings");
         res.send({
@@ -51,7 +52,7 @@ exports.getUserList = async (req, res, next) => {
         };
         const sort = {};
         const pageSkip = (Number(req.query.page)) ? Number(req.query.page) : 1;
-        const limit = 10;
+        const limit = 3;
         const skip = (pageSkip - 1) * limit;
 
         //if req.query.search consists value than searching applied parameter applies to fetch records from Database
@@ -113,7 +114,8 @@ exports.getUserList = async (req, res, next) => {
                 users: currentUsers,
                 page: page,
                 layout: 'blank',
-                searchValue: req.query.search
+                searchValue: req.query.search,
+                currentPage: pageSkip
             });
         }
         //otherwise load data through rendering report page
@@ -122,7 +124,8 @@ exports.getUserList = async (req, res, next) => {
             res.render('admin/userList', {
                 title: 'Users',
                 users: currentUsers,
-                page: page
+                page: page,
+                currentPage: pageSkip
             });
         }
     } catch (error) {
@@ -130,3 +133,4 @@ exports.getUserList = async (req, res, next) => {
         console.log(error);
     }
 };
+

@@ -4,9 +4,7 @@ const cookieSession = require('cookie-session');
 const session = require('express-session');
 const cookieParser = require('cookie-parser');
 const userModel = require('../schema/userSchema');
-const hashConversion = require('../helpers/function');
-
-
+const { generatePasswordHash } = require('../helpers/function');
 
 module.exports = {
 
@@ -45,19 +43,10 @@ module.exports = {
                         $regex: '^' + email + '$',
                         $options: 'i'
                     },
-                    "password": hashConversion.generatePasswordHash(pswd)
+                    "password": generatePasswordHash(pswd)
                 }, {
-                    _id: 1,
-                    role:1,
-                    fname: 1,
-                    lname: 1,
-                    gender: 1,
-                    password: 1,
-                    email: 1,
-                    fullName: 1,
-                    referLink:1,
-                    availableCoins:1
-                }).lean().then(async function (user) {
+                    _id: 1
+                }).then(async function (user) {
                     // if user not found
                     if (!user) {
                         return done(null, false, {
@@ -79,11 +68,20 @@ module.exports = {
             console.log(req.user);
             done(null, user);
         });
-        passport.deserializeUser(function (req, user, done) {
+        passport.deserializeUser(async function (req, user, done) {
             try {
+
+                const currentUser = await userModel.findOne({ "_id": user._id }, {
+                    _id: 1,
+                    role: 1,
+                    fullName: 1,
+                    referLink: 1,
+                    availableCoins: 1
+                }).lean();
+
                 console.log("deserializeUser");
-                console.log(req.user);
-                done(null, user);
+                console.log(currentUser);
+                done(null, currentUser);
             } catch (error) {
                 console.log(error);
             }

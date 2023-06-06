@@ -1,4 +1,6 @@
 const userModel = require('../schema/userSchema');
+const transactionModel = require('../schema/transactions');
+
 const functionUsage = require('../helpers/function');
 const passport = require('passport');
 const referralBonusService = require('../services/user.services');
@@ -7,6 +9,8 @@ exports.registration = async (req, res, next) => {
         const userDetails = req.body;
         const exist = await userModel.countDocuments({ email: userDetails.email, role: 'user' });
         if (exist) {
+            //if user is already registered with this e-mail
+            //send response with type error and message "E-mail is already registered"
             const response = {
                 type: "error",
                 message: "E-mail is already registered by another user"
@@ -15,6 +19,7 @@ exports.registration = async (req, res, next) => {
             res.send(response);
         }
         else {
+            //else Creates a new user object that will be stored in users collection
             const user = await new userModel({
                 "fname": userDetails.fname,
                 "lname": userDetails.lname,
@@ -23,7 +28,7 @@ exports.registration = async (req, res, next) => {
                 "phone": userDetails.phone,
                 "password": functionUsage.generatePasswordHash(userDetails.password),
                 "referLink": await functionUsage.generateReferLink(6),
-                "availableCoins": await functionUsage.welcomeBonus()
+                "availableCoins": await functionUsage.getWelcomeBonus()
             });
             await user.save();
             //after store in database store details in browser's cache and redirect to dashboard page
@@ -39,12 +44,10 @@ exports.registration = async (req, res, next) => {
                 if (userDetails.referral) {
                     const referral = await userModel.findOne({ "referLink": userDetails.referral }, { "_id": 1, "referralUsers": 1 });
                     //checks if applied referral code is valid and limit of referring user is applicable
-
-                    if (referral.referralUsers <= await functionUsage.referralCount()) {
-
+                    if (referral.referralUsers <= await functionUsage.getReferralCount()) {
                         //if user entered referral code is valid and limit of referring user is applicable
                         // than that referred user will get extra referral bonus via referBonus service
-                        await referralBonusService.referralBonus(referral._id);
+                        await referralBonusService.applyReferBonus(referral._id);
                     }
                 }
                 res.send({
@@ -130,6 +133,93 @@ exports.redirectToDashboard = async (req, res) => {
         });
     }
 };
+
+//getTransactions function gets all transactions of logged-in user
+exports.getTransactions = async (req, res, next) => {
+    try {
+        const find = {
+            "user_id": req.user._id
+        };
+        const sort = {};
+
+        //if user wants to move to specific page than that page count which is passed in query parameter
+        //using skip and limit achieve that page's data
+        const pageSkip = (Number(req.query.page)) ? Number(req.query.page) : 1;
+        const limit = 3;
+        const skip = (pageSkip - 1) * limit;
+        const search = {}
+
+        if (req.query.sort) {
+            //if user wants to sort transaction by field than add sort in mongoose query and sort results by that field
+            sort[req.query.sort] = req.query.sortOrder == 'ASC' ? 1 : -1
+        }
+        else {
+            //else sort all transactions by latest created
+            sort._id = -1
+        }
+        if (req.query.amount) {
+            //if user wants to search transaction by amount than searching is applied while fetching transactions records
+            find['amount'] = req.query.amount;
+            search['searchAmount'] = req.query.amount;
+        }
+        if (req.query.txtType && req.query.txtType != 'all') {
+            //if user filters transactions by type(welcome-bonus,referral-bonus,image-deduction)
+            //than only that type of records are fetched from database
+            find['type'] = req.query.txtType;
+            search['filterType'] = req.query.txtType;
+        }
+        if (req.query.status && req.query.status != 'all') {
+
+            //if user filters transactions by action(credit,debit)
+            //than only that type of records are fetched from database
+            find['status'] = req.query.status;
+            search['filterStatus'] = req.query.status;
+        }
+        const transactions = await transactionModel.find(
+            find
+            , {
+                "_id": 0,
+                "status": 1,
+                "amount": 1,
+                "type": 1
+            }).sort(sort).skip(skip).limit(limit).lean();
+
+        //find total count of users
+        const totalEntry = await transactionModel.countDocuments(
+            find
+        );
+        //generates pages by dividing total users displayed in one page
+        const pageCount = Math.ceil(totalEntry / limit);
+        const page = [];
+        for (let i = 1; i <= pageCount; i++) {
+            page.push(i);
+        }
+
+        //if this route is called using ajax request than load transactions through partials
+        if (req.xhr) {
+            res.render('user/transaction', {
+                title: 'Transactions',
+                layout: 'blank',
+                page: page,
+                search: search,
+                transactions: transactions,
+                currentPage:pageSkip
+            });
+        }
+        //otherwise load data through rendering transaction page
+        else {
+            res.render('user/transaction', {
+                title: 'Transactions',
+                page: page,
+                transactions: transactions,
+                currentPage:pageSkip
+            });
+        }
+    } catch (error) {
+        console.log("Error Generated While User access Transaction Page");
+        console.log(error);
+    }
+}
 
 function _isLoggedIn(req, res, next) {
     if (req.user) {

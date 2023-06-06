@@ -57,7 +57,6 @@ try {
         });
         if (admin) {
             console.log("Admin user is already exists");
-            console.log("General Settings are already applied");
         }
         //else create an admin for application
         else {
@@ -75,12 +74,10 @@ try {
             //stores admin details in users collection
             await admin.save();
             console.log("Admin user created successfully");
-
-            await functionUsage.applySettings()
-            const settings = await functionUsage.applySettings();
-            await settingModel.updateOne({}, { $set: settings }, { upsert: true });
-            console.log("General Settings are applied successfully");
         }
+        const settings = await functionUsage.applySettings();
+        await settingModel.updateOne({}, { $set: settings }, { upsert: true });
+        console.log("General Settings are applied successfully");
         process.exit(0);
     })();
 }

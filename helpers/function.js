@@ -12,7 +12,7 @@ const transactionModel = require('../schema/transactions');
 module.exports = {
 
     //referralBonus function returns referral bonus fetched from settings collection
-    _referralBonus: async function () {
+    _getReferralBonus: async function () {
         const referralBonus = await settingModel.findOne({}, { "referralBonus": 1, "_id": 0 });
         return referralBonus.referralBonus;
     },
@@ -24,28 +24,35 @@ module.exports = {
 
     //applySettings function returns updated settings value's object with key
     applySettings: function (req) {
-        const settings = {};
         if (req) {
-
+            //if admin wants to apply general setting than passed parameters are applied and
+            //returns an object which consists update value of general settings
+            const settings = req;
+            return settings;
         }
         else {
-            settings.welcomeBonus = process.env.welcomeBonus,
-                settings.referralBonus = process.env.referralBonus,
-                settings.chargePerImage = process.env.chargePerImage,
-                settings.maxRefer = process.env.maxRefer
+
+            //Otherwise set a general settings value from the env variable
+            const settings = {
+                welcomeBonus:process.env.welcomeBonus,
+                referralBonus : process.env.referralBonus,
+                chargePerImage : process.env.chargePerImage,
+                maxRefer : process.env.maxRefer
+            }
+            return settings;
         }
-        return settings;
     },
 
     //applyReferBonus function applies referral bonus to the applicable user
     applyReferBonus: async function (user) {
         const _this = this;
+        const referralBonus = await this._getReferralBonus()
         await userModel.updateOne({
             "_id": user
         },
             {
                 $inc: {
-                    "availableCoins": await this._referralBonus(),
+                    "availableCoins": referralBonus,
                     "referralUsers": 1
                 }
 
@@ -55,11 +62,10 @@ module.exports = {
         const transaction = await new transactionModel({
             'user_id': user,
             'status': 'credit',
-            'amount': await this._referralBonus(),
+            'amount': referralBonus,
             'type': `referral-bonus`
         });
         await transaction.save();
-
     },
     //generateReferLink function generates unique referral code for referring to other user
     generateReferLink: async function (length) {
@@ -82,14 +88,14 @@ module.exports = {
         }
     },
 
-    //welcomeBonus function returns welcome bonus fetched from settings collection
-    welcomeBonus: async function () {
+    //getWelcomeBonus function returns welcome bonus fetched from settings collection
+    getWelcomeBonus: async function () {
         const welcomeBonus = await settingModel.findOne({}, { "welcomeBonus": 1, "_id": 0 });
         return welcomeBonus.welcomeBonus;
     },
 
-    //referralCount function returns referral user's Count fetched from settings collection
-    referralCount: async function () {
+    //getReferralCount function returns referral user's Count fetched from settings collection
+    getReferralCount: async function () {
         const referralCount = await settingModel.findOne({}, { "maxRefer": 1, "_id": 0 });
         return referralCount.maxRefer;
     },
