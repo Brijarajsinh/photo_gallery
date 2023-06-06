@@ -62,24 +62,18 @@ userSchema.pre('save', async function (next) {
     //this function creates full name of user based on first name and last name
     const full_name = `${this.fname} ${this.lname}`;
     this.fullName = full_name;
+
+    if (`${this.role}` == 'user') {
+        const transaction = await new transactionModel({
+            'user_id': `${this._id}`,
+            'status': 'credit',
+            'amount': `${this.availableCoins}`,
+            'type': `welcome-bonus`
+        });
+        await transaction.save();
+    }
     next();
 });
-
-
-//post hook will be executed after save any user's details in users collection
-userSchema.post('save', async function (next) {
-    //this function enter transaction of welcome bonus of user
-    const transaction = await new transactionModel({
-        'user_id': `${this._id}`,
-        'balance': `${this.availableCoins}`,
-        'amount': `${this.availableCoins}`
-    });
-    await transaction.save();
-    next();
-});
-
-
-
 
 const UserModel = mongoose.model('users', userSchema);
 module.exports = UserModel;

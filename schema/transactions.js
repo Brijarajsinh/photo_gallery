@@ -14,19 +14,21 @@ const transactionSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         required: true
     },
-    balance: {
-        type: Number,
-        required: true
-    },
-    action: {
+    status: {
         type: String,
         enum: ['credit', 'debit'],
-        default:'credit'
+        default: 'debit'
     },
     amount: {
         type: Number,
         required: true
     },
+    type: {
+        type: String,
+        enum: ['welcome-bonus', 'referral-bonus', 'image-deduction'],
+        default: 'image-deduction'
+
+    }
 }, option);
 const transactionModel = mongoose.model('transactions', transactionSchema);
 module.exports = transactionModel;

@@ -6,6 +6,8 @@ const md = forge.md.sha512.sha256.create();
 //requiring model to work with collection of that models
 const userModel = require('../schema/userSchema');
 const settingModel = require('../schema/generalSettings');
+const transactionModel = require('../schema/transactions');
+
 
 module.exports = {
 
@@ -48,6 +50,16 @@ module.exports = {
                 }
 
             });
+
+        //Store Entry In Transaction Model To Track User's Wallet Transactions
+        const transaction = await new transactionModel({
+            'user_id': user,
+            'status': 'credit',
+            'amount': await this._referralBonus(),
+            'type': `referral-bonus`
+        });
+        await transaction.save();
+
     },
     //generateReferLink function generates unique referral code for referring to other user
     generateReferLink: async function (length) {
@@ -83,19 +95,17 @@ module.exports = {
     },
 
     //check admin function allows only admins to access functionality of admin role
-    checkAdmin:async function(req,res,next){
-        if(req.user.role == 'admin'){
+    checkAdmin: async function (req, res, next) {
+        if (req.user.role == 'admin') {
             return next();
         }
         return res.redirect('/dashboard');
-    
-        
     },
 
     //check user function allows only users to access functionality of user role
 
-    checkUser:async function(req,res,next){
-        if(req.user.role == 'user'){
+    checkUser: async function (req, res, next) {
+        if (req.user.role == 'user') {
             return next();
         }
         return res.redirect('/dashboard');

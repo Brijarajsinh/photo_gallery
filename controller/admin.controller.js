@@ -76,7 +76,7 @@ exports.getUserList = async (req, res, next) => {
         }
 
         if (req.query.sort) {
-            sort[req.query.sort] = req.query.sortOrder
+            sort[req.query.sort] = req.query.sortOrder == 'ASC' ? 1 : -1
         }
         else {
             sort._id = 1

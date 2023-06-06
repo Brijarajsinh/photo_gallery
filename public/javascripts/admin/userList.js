@@ -85,8 +85,8 @@ $(function () {
             url: url,
             success: function (res) {
                 $("#main").html(res);
-                if (sortOrder == '1') $(`#${sort}`).attr('data-flag', '-1');
-                else $(`#${sort}`).attr('data-flag', '1');
+                if (sortOrder == 'ASC') $(`#${sort}`).attr('data-flag', 'DSC');
+                else $(`#${sort}`).attr('data-flag', 'ASC');
             },
             error: function (err) {
                 console.log(err.toString());

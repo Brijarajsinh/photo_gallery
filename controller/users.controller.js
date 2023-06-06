@@ -2,7 +2,6 @@ const userModel = require('../schema/userSchema');
 const functionUsage = require('../helpers/function');
 const passport = require('passport');
 const referralBonusService = require('../services/user.services');
-const transactionModel = require('../schema/transactions');
 exports.registration = async (req, res, next) => {
     try {
         const userDetails = req.body;
@@ -46,15 +45,6 @@ exports.registration = async (req, res, next) => {
                         //if user entered referral code is valid and limit of referring user is applicable
                         // than that referred user will get extra referral bonus via referBonus service
                         await referralBonusService.referralBonus(referral._id);
-                        const transactionDetails = await transactionModel.findOne({ "referLink": user.referLink });
-                        console.log("TRANSACTIONS:____------> ");
-                        console.log(transactionDetails);
-                        // const transaction = await new transactionModel({
-                        //     'user_id': `${_id}`,
-                        //     'balance': `${this.availableCoins}`,
-                        //     'amount': `${this.availableCoins}`
-                        // });
-                        // await transaction.save();
                     }
                 }
                 res.send({
@@ -130,12 +120,12 @@ exports.checkEmail = async (req, res) => {
 //this function checks role of logged in user and according to role allow functionalities
 exports.redirectToDashboard = async (req, res) => {
     if (req.user.role == 'admin') {
-        res.render('dashboard', {
+        res.render('admin', {
             title: 'Dashboard'
         });
     }
     else {
-        res.render('landing', {
+        res.render('user', {
             title: 'Dashboard'
         });
     }

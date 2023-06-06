@@ -18,7 +18,7 @@ const dashboardRouter = require('./routes/dashboard');
 const settingRouter = require('./routes/settings');
 const userListRouter = require('./routes/userList');
 // const galleryRouter = require('./routes/gallery');
-// const transactionRouter = require('./routes/transaction');
+const transactionRouter = require('./routes/transaction');
 //Requiring Flash
 const flash = require('connect-flash');
 
@@ -92,7 +92,7 @@ app.use('/settings', settingRouter);
 app.use('/user-list', userListRouter);
 
 // app.use('/gallery', galleryRouter);
-// app.use('/transaction', transactionRouter);
+ app.use('/transaction', transactionRouter);
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
   next(createError(404));
