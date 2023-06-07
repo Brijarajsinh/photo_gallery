@@ -1,6 +1,6 @@
 exports.getGallery = async (req, res, next) => {
     try {
-        console.log("ROUTE Called");
+        console.log("Gallery ROUTE Called");
         res.render('user/gallery', {
             title: 'Gallery'
         });

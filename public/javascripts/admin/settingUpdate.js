@@ -75,8 +75,30 @@ $(function () {
                         alert(res.message);
                     }
                 }
-
             })
         }
     });
 });
+
+
+// const settingsHandler = function () {
+//     this.init = function(){
+//         this.updateSettingEventHandler();
+//         this.copyToClipboardEventHandler();
+//         this.imageUploadEventHandler();
+//     };
+
+//     this.updateSettingEventHandler = function () {
+//         // to do
+//         // your logic
+//     };
+
+//     this.copyToClipboardEventHandler = function () {
+//         // to do
+//         // your logic
+//     };
+
+//     const _this  = this;
+//     _this.init();
+// } 
+

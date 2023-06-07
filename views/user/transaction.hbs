@@ -11,8 +11,8 @@
             <div class="page-header float-right">
                 <div class="page-title">
                     <ol class="breadcrumb text-right">
-                        <li><a href="javascript:void(0);">Dashboard</a></li>
-                        <li><a href="javascript:void(0);">Transactions</a></li>
+                        <li><a href="/dashboard">Dashboard</a></li>
+                        <li><a href="/transaction">Transactions</a></li>
                     </ol>
                 </div>
             </div>
@@ -36,7 +36,7 @@
                                     <table border="0">
                                         <tr>
                                             <th>
-                                                <li class="nav-item dropdown card-body float-right">
+                                                <div class="nav-item dropdown card-body float-right">
                                                     <label for="filtering">Filter Transactions By
                                                         Status:</label>
                                                     <select class="filter-status">
@@ -48,10 +48,10 @@
                                                             search.filterStatus '==' 'debit' }} selected {{/compare}}>
                                                             Debit</option>
                                                     </select>
-                                                </li>
+                                                </div>
                                             </th>
                                             <th>
-                                                <li class="nav-item dropdown card-body float-right">
+                                                <div class="nav-item dropdown card-body float-right">
                                                     <label for="filtering">Filter Transactions By Type:</label>
                                                     <select class="filter-type">
                                                         <option value="all">All</option>
@@ -68,10 +68,10 @@
                                                             {{/compare}}>
                                                             Image Deduction</option>
                                                     </select>
-                                                </li>
+                                                </div>
                                             </th>
                                             <th>
-                                                <li class="nav-item dropdown card-body float-right">
+                                                <div class="nav-item dropdown card-body float-right">
                                                     <input type="button"
                                                         class="btn-danger ml-1 clear-transaction float-right"
                                                         value="Clear" />
@@ -81,7 +81,7 @@
                                                     <input type="number" class="search-amount float-right"
                                                         placeholder="Search by Amount"
                                                         value="{{search.searchAmount}}" />
-                                                </li>
+                                                </div>
                                             </th>
                                         </tr>
                                     </table>
@@ -127,7 +127,7 @@
         <ul class="pagination justify-content-center">
             {{#each page}}
             <li class="page-item"><a
-                    class="page-link entry-wise {{#compare ../currentPage '==' this}}bg-light{{/compare}}"
+                    class="page-link entry-wise {{#compare ../currentPage '==' this}}bg-dark{{/compare}}"
                     href="javascript:void(0);" data-page={{this}}>{{this}}</a>
             </li>
             {{/each}}

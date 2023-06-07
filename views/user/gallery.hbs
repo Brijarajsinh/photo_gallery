@@ -10,15 +10,19 @@
         <div class="page-header float-right">
             <div class="page-title">
                 <ol class="breadcrumb text-right">
-                    <li><a href="javascript:void(0);">Dashboard</a></li>
-                    <li><a href="javascript:void(0);">Gallery</a></li>
+                    <li><a href="/dashboard">Dashboard</a></li>
+                    <li><a href="/gallery">Gallery</a></li>
 
                 </ol>
             </div>
         </div>
     </div>
 </div>
-<h2 class="ml-1">Welcome to dashboard page your referral link is <b class="referral-link">{{user.referLink}}</b>.
-    <br><a href="javascript:void(0)" class="copy-referral-link">Click here</a> to copy referral link</h2>
-
-{{!-- <script src="/javascripts/user/index.js"></script> --}}
+<div class="text-right mr-2">
+    <a href="/gallery/upload-image"><button type="button" class="btn btn-primary upload-image" data-bs-toggle="modal"
+            data-bs-target="#staticBackdrop">
+            Upload Image
+        </button></a>
+</div>
+{{!--
+<script src="/javascripts/user/index.js"></script> --}}

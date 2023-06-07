@@ -91,7 +91,7 @@ exports.login = async (req, res) => {
 //signUp controller render sign-up page to the user
 exports.signUp = async (req, res) => {
     await _isLoggedIn(req, res);
-    res.render('sign-up', { title: 'Registration Page', layout: 'beforeLogin' })
+    res.render('sign-up', { title: 'Registration Page', layout: 'beforeLogin', referral: req.query.referral })
 }
 
 //loginPage Controller render login page to the user
@@ -203,7 +203,7 @@ exports.getTransactions = async (req, res, next) => {
                 page: page,
                 search: search,
                 transactions: transactions,
-                currentPage:pageSkip
+                currentPage: pageSkip
             });
         }
         //otherwise load data through rendering transaction page
@@ -212,7 +212,7 @@ exports.getTransactions = async (req, res, next) => {
                 title: 'Transactions',
                 page: page,
                 transactions: transactions,
-                currentPage:pageSkip
+                currentPage: pageSkip
             });
         }
     } catch (error) {

@@ -10,13 +10,16 @@
         <div class="page-header float-right">
             <div class="page-title">
                 <ol class="breadcrumb text-right">
-                    <li><a href="javascript:void(0);">Dashboard</a></li>
+                    <li><a href="/dashboard">Dashboard</a></li>
                 </ol>
             </div>
         </div>
     </div>
 </div>
-<h2 class="ml-1">Welcome to dashboard page your referral link is <b class="referral-link">{{user.referLink}}</b>.
-    <br><a href="javascript:void(0)" class="copy-referral-link">Click here</a> to copy referral link</h2>
+<h2 class="ml-1">Refer Link<br>
+    <input type="text" class="w-50 referral-link" value="http://localhost:3000/sign-up?referral={{user.referLink}}"
+        readonly />
+    <input type="button" value="Copy Link" class="mt-1 btn-primary copy-referral-link" />
+</h2>
 
 <script src="/javascripts/user/index.js"></script>
