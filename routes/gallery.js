@@ -1,18 +1,17 @@
 //requiring necessary packages
 const express = require('express');
 const router = express.Router();
-const checkRole = require('../helpers/function');
-const galleryController = require('../controller/gallery.controller');
+const commonFunction = require('../helpers/function');
 const multer = require('multer');
-const path = require('path');
-
+const { getGallery } = require('../controller/gallery.controller');
+const { uploadImageController } = require('../controller/gallery.controller');
+const { getUploadImagePage } = require('../controller/gallery.controller');
 const imageStorage = multer.diskStorage({
     destination: (req, file, cb) => {
-        cb(null, './public/uploads/gallery/')
+        cb(null, './public/uploads/gallery/');
     },
     filename: function (req, file, cb) {
-        console.log("file => ", file);
-        cb(null, file.originalname + Date.now() + path.extname(file.originalname));
+        cb(null, Date.now() + file.originalname);
     }
 });
 const image = multer({
@@ -28,43 +27,12 @@ const image = multer({
 
 
 //get Route to render dashboard page of the application after user registered successfully or user login successfully
-router.get('/', checkRole.checkUser, galleryController.getGallery);
+router.get('/', commonFunction.checkUser, getGallery);
 
-router.get('/upload-image', checkRole.checkUser, async function (req, res, next) {
+//get '/upload-image' Route to render image-upload page on click of upload image button
+router.get('/upload-image', commonFunction.checkUser, getUploadImagePage);
 
-    try {
-        console.log("Route Called to upload-image client-side");
-        res.render('user/upload', {
-            title: 'Upload Image'
-        });
-    } catch (error) {
-        console.log("Error generated While rendering upload-image page to user");
-        console.log(error.toString());
-        res.send({
-            type: 'error',
-            message: error.toString()
-        });
-    }
-
-});
-
-router.post('/upload-image', checkRole.checkUser, image.array('photos'), async function (req, res, next) {
-    try {
-        console.log("Route Called to upload-image server side");
-        console.log(req.body);
-        console.log(req.files);
-        const response = {
-            type: 'success'
-        }
-        res.send(response);
-    } catch (error) {
-        console.log("Error Generated in uploading image");
-        console.log(error.toString());
-        res.send({
-            type: 'error',
-            message: error.toString()
-        });
-    }
-});
+//post Route to add records in image collection
+router.post('/upload-image', commonFunction.checkUser, image.array('photos'), uploadImageController);
 
 module.exports = router;

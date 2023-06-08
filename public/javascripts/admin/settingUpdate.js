@@ -1,4 +1,6 @@
 $(function () {
+
+    //validating edit-form of settings using jquery validation method
     $("#edit-setting-form").validate({
         keypress: true,
         errorClass: 'error',
@@ -10,6 +12,8 @@ $(function () {
                 .removeClass(validClass);
         },
         rules: {
+
+            //rules to enter value in form's input-fields
             "welcomeBonus": {
                 required: true,
                 min: 0,
@@ -32,6 +36,8 @@ $(function () {
             },
         },
         messages: {
+
+            //messages for breaking the rules
             "welcomeBonus": {
                 required: 'Please Enter Welcome Bonus',
                 min: 'Welcome Bonus is not allowed below 0',
@@ -53,6 +59,7 @@ $(function () {
                 max: 'Maximum Refer Count is not allowed more than 10'
             },
         },
+        
         //if error generates by jquery validator
         errorPlacement: function (error, element) {
             error.insertAfter(element);

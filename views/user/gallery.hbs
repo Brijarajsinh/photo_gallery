@@ -1,28 +1,122 @@
-<div class="breadcrumbs">
-    <div class="col-sm-4">
-        <div class="page-header float-left">
-            <div class="page-title">
-                <h1>Dashboard</h1>
+<div id="images-page">
+    <div class="breadcrumbs">
+        <div class="col-sm-4">
+            <div class="page-header float-left">
+                <div class="page-title">
+                    <h1>Dashboard</h1>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-8">
+            <div class="page-header float-right">
+                <div class="page-title">
+                    <ol class="breadcrumb text-right">
+                        <li><a href="/dashboard">Dashboard</a></li>
+                        <li><a href="/gallery">Gallery</a></li>
+                    </ol>
+                </div>
             </div>
         </div>
     </div>
-    <div class="col-sm-8">
-        <div class="page-header float-right">
-            <div class="page-title">
-                <ol class="breadcrumb text-right">
-                    <li><a href="/dashboard">Dashboard</a></li>
-                    <li><a href="/gallery">Gallery</a></li>
+    <div class="text-right mr-2 mb-2">
+        <a href="/gallery/upload-image"><button type="button" class="btn btn-primary upload-image"
+                data-bs-toggle="modal" data-bs-target="#staticBackdrop">
+                Upload Image
+            </button></a>
+    </div>
+    <div class="card card-md">
+        <div class="card-body">
+            <b>
+                <div class="content mt-3">
+                    <div class="animated fadeIn">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <div class="row">
+                                            <div class="col">
+                                                <strong class="card-title">Gallery</strong>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <table border="0">
+                                        <tr>
+                                            <th>
+                                                <div class="nav-item dropdown card-body float-right">
+                                                    <label for="filtering">Filter Uploaded Images By
+                                                        Date:</label>
+                                                    <input type="datetime-local" class="start-date" value={{#if
+                                                        search.from}}{{search.from}}{{else}}"{{startDate}}"{{/if}} />
+                                                    <input type="datetime-local" class="end-date" value={{#if
+                                                        search.to}}{{search.to}}{{else}}"{{endDate}}"{{/if}} />
+                                                </div>
+                                            </th>
+                                            <th>
+                                                <div class="nav-item dropdown card-body float-right">
+                                                    <input type="button" class="btn-danger ml-1 clear-image float-right"
+                                                        value="Clear" />
+                                                    <input type="button"
+                                                        class="btn-primary ml-1 search-image float-right"
+                                                        value="Search" />
+                                                    <input type="number" class="search-cost float-right"
+                                                        placeholder="Search by Image Cost" />
+                                                </div>
+                                            </th>
+                                        </tr>
+                                    </table>
+                                    <div class="card-body mt-0">
+                                        <table id="bootstrap-data-table-export"
+                                            class="table table-striped table-bordered">
+                                            <thead>
+                                                <tr role="row">
+                                                    <th>Name</th>
+                                                    <th>Image</th>
+                                                    <th class="sort createdAt" value="createdAt" data-flag="ASC"
+                                                        id="createdAt">
+                                                        Uploaded On<i class="fa fa-sort float-right"></i></th>
+                                                    <th class="sort charge" value="charge" data-flag="ASC" id="charge">
+                                                        Image Cost<i class="fa fa-sort float-right"></i>
+                                                    </th>
+                                                </tr>
+                                            </thead>
+                                            <tbody class="image-table">
+                                                {{#if images}}
+                                                {{#each images}}
+                                                <tr>
+                                                    <td>{{originalName}}</td>
+                                                    <td class="text-center"><img src="/uploads/gallery/{{image}}"
+                                                            class="image-upload"></td>
+                                                    <td>{{dateConvert createdAt}}</td>
+                                                    <td>{{charge}}</td>
+                                                </tr>
+                                                {{/each}}
+                                                {{else}}
+                                                <tr>
+                                                    <td class="text-center" colspan="4">No images Uploaded</td>
+                                                </tr>
+                                                {{/if}}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </b>
+        </div>
+    </div>
+    <nav aria-label="Page navigation example">
+        <ul class="pagination justify-content-center">
+            {{#each page}}
+            <li class="page-item"><a
+                    class="page-link image-wise {{#compare ../currentPage '==' this}}bg-dark{{/compare}}"
+                    href="javascript:void(0);" data-page={{this}}>{{this}}</a>
+            </li>
+            {{/each}}
+        </ul>
+    </nav>
 
-                </ol>
-            </div>
-        </div>
-    </div>
+
+    <script src="/javascripts/user/gallery.js"></script>
 </div>
-<div class="text-right mr-2">
-    <a href="/gallery/upload-image"><button type="button" class="btn btn-primary upload-image" data-bs-toggle="modal"
-            data-bs-target="#staticBackdrop">
-            Upload Image
-        </button></a>
-</div>
-{{!--
-<script src="/javascripts/user/index.js"></script> --}}

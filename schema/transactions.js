@@ -8,9 +8,9 @@ const option = {
     timestamps: true
 }
 
-//defining settingSchema with options
+//defining transactionSchema with options
 const transactionSchema = new mongoose.Schema({
-    user_id: {
+    userId: {
         type: mongoose.Schema.Types.ObjectId,
         required: true
     },
@@ -27,8 +27,15 @@ const transactionSchema = new mongoose.Schema({
         type: String,
         enum: ['welcome-bonus', 'referral-bonus', 'image-deduction'],
         default: 'image-deduction'
-
+    },
+    description: {
+        type: String,
+        required: true
     }
 }, option);
+
+//creating model for above described schema
 const transactionModel = mongoose.model('transactions', transactionSchema);
+
+//exporting model
 module.exports = transactionModel;

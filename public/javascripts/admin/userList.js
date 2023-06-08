@@ -1,7 +1,4 @@
 $(function () {
-    // console.log("Current Page is" + window.location.search);
-    // $("li").find(`[data-page='${1}']`).addClass("bg-dark current-user-page");
-
 
     //getUrl function creates url to call route with query parameters of search and page number
     function getUrl() {
@@ -10,7 +7,6 @@ $(function () {
         //if logged-in user search other user by first name, last name and full name
         // than that search value is passed in query parameter 
         if (search) {
-            // url += `?search=${search}&`
             url.searchParams.set("search", `${search}`);
         }
 
@@ -40,7 +36,6 @@ $(function () {
     $(".user-wise").on('click', function () {
         const page = $(this).data("page");
         let url = getUrl();
-        // url += `&page=${page}&`;
         url.searchParams.set("page", `${page}`);
         history.pushState({}, "", url);
 
@@ -49,12 +44,7 @@ $(function () {
             type: "get",
             url: url,
             success: function (res) {
-                // $(".current-page").removeClass('bg-dark current-user-page');
-                // $(".current-page").addClass('bg-white');
-
                 $("#main").html(res);
-
-                // $("li").find(`[data-page='${page}']`).addClass("bg-dark current-user-page");
             },
             error: function (err) {
                 console.log(err.toString());
@@ -74,8 +64,6 @@ $(function () {
         let url = getUrl();
         const sort = $(this).attr(`value`);
         const sortOrder = $(this).attr(`data-flag`);
-
-        // url += `&sort=${sort}&sortOrder=${sortOrder}`;
         url.searchParams.set("sort", `${sort}`);
         url.searchParams.set("sortOrder", `${sortOrder}`);
         history.pushState({}, "", url);

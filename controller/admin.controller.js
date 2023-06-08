@@ -1,16 +1,18 @@
+//requiring model to work with collection of that models
 const settingModel = require('../schema/generalSettings');
 const userModel = require('../schema/userSchema');
+
+//applySettings function updates general settings
 const { applySettings } = require('../helpers/function');
-//this controller fetches current general-settings
+
+//getSettings function fetches current general-setting  from db
+const { getSettings } = require('../helpers/function');
+
+
+//getGeneralSettings function fetches current general-settings
 exports.getGeneralSettings = async (req, res, next) => {
     try {
-        const currentDetails = await settingModel.findOne({}, {
-            "_id": 0,
-            "chargePerImage": 1,
-            "maxRefer": 1,
-            "referralBonus": 1,
-            "welcomeBonus": 1
-        }).lean();
+        const currentDetails = await getSettings();
         res.render('admin/settings', {
             title: 'Settings',
             currentDetails: currentDetails
@@ -23,10 +25,9 @@ exports.getGeneralSettings = async (req, res, next) => {
     }
 };
 
-//this controller updates general setting in database
+//updateGeneralSettings controller updates general setting in database
 exports.updateGeneralSettings = async (req, res, next) => {
     try {
-
         const settings = await applySettings(req.body);
         await settingModel.updateOne({}, { $set: settings }, { upsert: true });
         res.send({
@@ -44,8 +45,7 @@ exports.updateGeneralSettings = async (req, res, next) => {
 
 
 //getUserList controller displays users of photo gallery application
-exports.getUserList = async (req, res, next) => {
-
+exports.getUserList = async (req, res) => {
     try {
         const find = {
             role: "user"
@@ -103,13 +103,11 @@ exports.getUserList = async (req, res, next) => {
         for (let i = 1; i <= pageCount; i++) {
             page.push(i);
         }
-
-
         //if this route is called using ajax request than load data through partials
         if (req.xhr) {
 
             //render userList page to display list of users
-            res.render('admin/userList', {
+            res.render('admin/user-list', {
                 title: 'Users',
                 users: currentUsers,
                 page: page,
@@ -121,7 +119,7 @@ exports.getUserList = async (req, res, next) => {
         //otherwise load data through rendering report page
         else {
             //render userList page to display list of users
-            res.render('admin/userList', {
+            res.render('admin/user-list', {
                 title: 'Users',
                 users: currentUsers,
                 page: page,

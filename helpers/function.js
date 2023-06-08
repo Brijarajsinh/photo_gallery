@@ -8,7 +8,6 @@ const userModel = require('../schema/userSchema');
 const settingModel = require('../schema/generalSettings');
 const transactionModel = require('../schema/transactions');
 
-
 module.exports = {
 
     //referralBonus function returns referral bonus fetched from settings collection
@@ -22,6 +21,18 @@ module.exports = {
         return forge.md.sha512.sha256.create().update(password).digest().toHex();
     },
 
+
+    getSettings:async function(){
+       return await settingModel.findOne({}, {
+            "_id": 0,
+            "chargePerImage": 1,
+            "maxRefer": 1,
+            "referralBonus": 1,
+            "welcomeBonus": 1
+        }).lean();
+        
+    },
+    
     //applySettings function returns updated settings value's object with key
     applySettings: function (req) {
         if (req) {
@@ -34,10 +45,10 @@ module.exports = {
 
             //Otherwise set a general settings value from the env variable
             const settings = {
-                welcomeBonus:process.env.welcomeBonus,
-                referralBonus : process.env.referralBonus,
-                chargePerImage : process.env.chargePerImage,
-                maxRefer : process.env.maxRefer
+                welcomeBonus: process.env.welcomeBonus,
+                referralBonus: process.env.referralBonus,
+                chargePerImage: process.env.chargePerImage,
+                maxRefer: process.env.maxRefer
             }
             return settings;
         }
@@ -60,10 +71,11 @@ module.exports = {
 
         //Store Entry In Transaction Model To Track User's Wallet Transactions
         const transaction = await new transactionModel({
-            'user_id': user,
+            'userId': user,
             'status': 'credit',
             'amount': referralBonus,
-            'type': `referral-bonus`
+            'type': `referral-bonus`,
+            'description':`${referralBonus} coins are credited for referring user`
         });
         await transaction.save();
     },
@@ -100,6 +112,19 @@ module.exports = {
         return referralCount.maxRefer;
     },
 
+    //getAvailableCoins function returns available coins of current logged-in user
+    getAvailableCoins: async function (userId) {
+        const availableCoins = await userModel.findOne({ "_id": userId }, { "availableCoins": 1, "_id": 0 });
+        return availableCoins.availableCoins;
+    },
+
+    //getImageUploadCharge function returns image deduction charge fetched from generalSettings collection
+    getImageUploadCharge: async function () {
+        const imageUploadCharge = await settingModel.findOne({}, { "chargePerImage": 1, "_id": 0 });
+        return imageUploadCharge.chargePerImage;
+    },
+
+
     //check admin function allows only admins to access functionality of admin role
     checkAdmin: async function (req, res, next) {
         if (req.user.role == 'admin') {
@@ -109,7 +134,6 @@ module.exports = {
     },
 
     //check user function allows only users to access functionality of user role
-
     checkUser: async function (req, res, next) {
         if (req.user.role == 'user') {
             return next();

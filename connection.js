@@ -1,4 +1,7 @@
+//requiring mongoose for connect with db
 const mongoose = require("mongoose");
+
+//requiring env variable to get connection string stored in env variable
 require('custom-env').env();
 
 module.exports = (async () => {

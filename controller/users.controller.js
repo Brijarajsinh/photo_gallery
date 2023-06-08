@@ -1,9 +1,12 @@
+//requiring model to work with collection of that models
 const userModel = require('../schema/userSchema');
 const transactionModel = require('../schema/transactions');
 
 const functionUsage = require('../helpers/function');
 const passport = require('passport');
 const referralBonusService = require('../services/user.services');
+
+//registration Controller render registration page to the client
 exports.registration = async (req, res, next) => {
     try {
         const userDetails = req.body;
@@ -91,13 +94,13 @@ exports.login = async (req, res) => {
 //signUp controller render sign-up page to the user
 exports.signUp = async (req, res) => {
     await _isLoggedIn(req, res);
-    res.render('sign-up', { title: 'Registration Page', layout: 'beforeLogin', referral: req.query.referral })
+    res.render('sign-up', { title: 'Registration Page', layout: 'before-login', referral: req.query.referral })
 }
 
 //loginPage Controller render login page to the user
 exports.loginPage = async (req, res) => {
     await _isLoggedIn(req, res);
-    res.render('login', { title: 'Login Page', layout: 'beforeLogin' });
+    res.render('login', { title: 'Login Page', layout: 'before-login' });
 }
 
 //log-out controller to control logout process of user
@@ -138,7 +141,7 @@ exports.redirectToDashboard = async (req, res) => {
 exports.getTransactions = async (req, res, next) => {
     try {
         const find = {
-            "user_id": req.user._id
+            "userId": req.user._id
         };
         const sort = {};
 

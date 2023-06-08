@@ -44,11 +44,11 @@
 <body>
 
   {{#compare user.role "==" "admin"}}
-  {{> adminPanel}}
+  {{> admin-panel}}
   {{/compare}}
 
   {{#compare user.role "==" "user"}}
-  {{> userPanel}}
+  {{> user-panel}}
   {{/compare}}
 
   <div id="right-panel" class="right-panel">
@@ -60,7 +60,7 @@
   <script src="/assets/vendors/popper.js/dist/umd/popper.min.js"></script>
   <script src="/assets/vendors/bootstrap/dist/js/bootstrap.min.js"></script>
   <script src="/assets/js/main.js"></script>
-  <script src="/assets/vendors/chart.js/dist/Chart.bundle.min.js"></script>
+  {{!-- <script src="/assets/vendors/chart.js/dist/Chart.bundle.min.js"></script> --}}
   <script src="/assets/js/dashboard.js"></script>
   <script src="/assets/js/widgets.js"></script>
   <script src="/assets/vendors/jqvmap/dist/jquery.vmap.min.js"></script>
@@ -84,17 +84,6 @@
       });
     })(jQuery);
   </script>
-
-
-
-
-  {{!--
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"
-    integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4"
-    crossorigin="anonymous"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js"
-    integrity="sha384-vFJXuSJphROIrBnz7yo7oB41mKfc8JzQZiCq4NCceLEaO4IHwicKwpJf9c9IpFgh"
-    crossorigin="anonymous"></script> --}}
 </body>
 
 </html>

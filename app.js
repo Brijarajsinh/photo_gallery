@@ -8,10 +8,7 @@ const exHbs = require('express-handlebars');
 const helpers = require('handlebars-helpers')();
 
 
-//requiring nocache package to restrict user from accessing previous page of browser
-const nocache = require("nocache");
-
-//requiring route to handle requests
+//requiring route to handle client requests
 const indexRouter = require('./routes/index');
 const userRouter = require('./routes/users');
 const dashboardRouter = require('./routes/dashboard');
@@ -19,24 +16,34 @@ const settingRouter = require('./routes/settings');
 const userListRouter = require('./routes/userList');
 const galleryRouter = require('./routes/gallery');
 const transactionRouter = require('./routes/transaction');
+const moment = require('moment');
 //Requiring Flash
 const flash = require('connect-flash');
 
 //Requiring AUTH.JS file to authenticate Process
 const auth = require('./helpers/auth');
+const { log } = require('console');
 
 //connection of application and database
 require('./connection')();
 
 const app = express();
 
-
 //default layout set to application
 const hbs = exHbs.create({
   extname: '.hbs',
   defaultLayout: 'main',
   helpers: {
-    ...helpers
+    ...helpers,
+    dateConvert: function (date1) {
+      return moment(date1).format('DD/MM/YYYY, h:mm a');
+    },
+    endDate: function () {
+      return moment(Date.now()).format('yy-MM-DDTHH:mm');
+    },
+    startDate: function () {
+      return moment(Date.now()).subtract(6, 'd').format('yy-MM-DDTHH:mm');
+    }
   }
 });
 
@@ -55,6 +62,8 @@ app.use(express.static(path.join(__dirname, 'public')));
 auth.login(app);
 
 app.use(flash());
+
+//If User Entered credential for login process is invalid than store message in flash and display client side
 app.use((req, res, next) => {
   if (req.user) {
     res.locals.user = req.user;
@@ -76,7 +85,6 @@ app.use((req, res, next) => {
   return next();
 });
 
-app.use(nocache());
 
 
 app.use('/', indexRouter);
@@ -85,14 +93,15 @@ app.use('/user', userRouter);
 //common middleware that restricts to access next all pages and routes without login
 app.use(auth.commonMiddleware);
 
-//dashboard page 
-//this page is only accessible after login
+
+//this page are only accessible after login
 app.use('/dashboard', dashboardRouter);
 app.use('/settings', settingRouter);
 app.use('/user-list', userListRouter);
+app.use('/gallery', galleryRouter);
+app.use('/transaction', transactionRouter);
 
- app.use('/gallery', galleryRouter);
- app.use('/transaction', transactionRouter);
+
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
   next(createError(404));

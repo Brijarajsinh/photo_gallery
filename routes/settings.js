@@ -3,6 +3,8 @@ const express = require('express');
 const router = express.Router();
 const adminController = require('../controller/admin.controller');
 const checkRole = require('../helpers/function');
+
+
 //get Route to fetch current general-settings
 router.get('/', checkRole.checkAdmin, adminController.getGeneralSettings);
 

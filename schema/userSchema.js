@@ -1,5 +1,7 @@
 //requiring mongoose  
 const { default: mongoose } = require("mongoose");
+
+//requiring transaction model to enter a transaction record of welcome bonus
 const transactionModel = require('../schema/transactions');
 
 
@@ -58,22 +60,32 @@ const userSchema = new mongoose.Schema({
 }, option);
 
 //pre hook will be executed before save any user's details in users collection
+
 userSchema.pre('save', async function (next) {
     //this function creates full name of user based on first name and last name
     const full_name = `${this.fname} ${this.lname}`;
+
+    //and stores the combination of first name and last name as full name in fullName field
     this.fullName = full_name;
 
     if (`${this.role}` == 'user') {
+
+        //if registered user's role is 'use' 
+        //then entry transaction of welcome bonus in transaction collection
         const transaction = await new transactionModel({
-            'user_id': `${this._id}`,
+            'userId': `${this._id}`,
             'status': 'credit',
             'amount': `${this.availableCoins}`,
-            'type': `welcome-bonus`
+            'type': `welcome-bonus`,
+            'description':`${this.availableCoins} coins are credited for registering in application`
         });
         await transaction.save();
     }
     next();
 });
 
+//creating model for above described schema
 const UserModel = mongoose.model('users', userSchema);
+
+//exporting model
 module.exports = UserModel;

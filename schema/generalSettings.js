@@ -1,5 +1,4 @@
 //requiring mongoose and custom-env
-
 const { default: mongoose } = require("mongoose");
 require('custom-env').env();
 
@@ -31,5 +30,9 @@ const settingSchema = new mongoose.Schema({
         default:process.env.maxRefer
     },
 }, option);
+
+//creating model for above described schema
 const settingModel = mongoose.model('generalSettings', settingSchema);
+
+//exporting model
 module.exports = settingModel;
