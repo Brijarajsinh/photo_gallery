@@ -12,6 +12,7 @@ const { getSettings } = require('../helpers/function');
 //getGeneralSettings function fetches current general-settings
 exports.getGeneralSettings = async (req, res, next) => {
     try {
+        console.log(await settingModel.findOne());
         const currentDetails = await getSettings();
         res.render('admin/settings', {
             title: 'Settings',
@@ -52,9 +53,8 @@ exports.getUserList = async (req, res) => {
         };
         const sort = {};
         const pageSkip = (Number(req.query.page)) ? Number(req.query.page) : 1;
-        const limit = 3;
+        const limit = 2;
         const skip = (pageSkip - 1) * limit;
-
         //if req.query.search consists value than searching applied parameter applies to fetch records from Database
         if (req.query.search) {
             find.$or = [
@@ -75,7 +75,6 @@ exports.getUserList = async (req, res) => {
                 }
             ]
         }
-
         if (req.query.sort) {
             sort[req.query.sort] = req.query.sortOrder == 'ASC' ? 1 : -1
         }

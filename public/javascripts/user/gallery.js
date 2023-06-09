@@ -1,6 +1,21 @@
-$(function () {
+const galleryHandler = (function () {
+    this.initialize = function () {
+
+        //sorting on gallery page of uploaded on and image cost with date and time
+        sortImageEventHandler();
+
+        //searching on gallery page by by cost
+        searchImageEventHandler();
+
+        //pagination on uploaded images view
+        paginationEventHandler();
+
+        //clear searching and filtering
+        clearEventHandler();
+    };
+
     //getUrl function creates url to call route with query parameters of search and page number in image table
-    function getUrl(sort, sortOrder, page) {
+    getUrl = function (sort, sortOrder, page) {
         const url = new URL(location);
         const search = $(".search-cost").val().trim();
         const startDate = $(".start-date").val();
@@ -32,59 +47,70 @@ $(function () {
     };
 
     //sorting on images  based on user selection
-    $(".sort").on('click', function () {
-        const sort = $(this).attr(`value`);
-        const sortOrder = $(this).attr(`data-flag`);
-        $.ajax({
-            type: "get",
-            url: getUrl(sort, sortOrder),
-            success: function (res) {
-                $("#images-page").html(res);
-                if (sortOrder == 'ASC') $(`#${sort}`).attr('data-flag', 'DSC');
-                else $(`#${sort}`).attr('data-flag', 'ASC');
-            },
-            error: function (err) {
-                console.log(err.toString());
-            }
+    sortImageEventHandler = function () {
+        $(".sort").on('click', function () {
+            const sort = $(this).attr(`value`);
+            const sortOrder = $(this).attr(`data-flag`);
+            $.ajax({
+                type: "get",
+                url: getUrl(sort, sortOrder),
+                success: function (res) {
+                    $("#images-page").html(res);
+                    console.log(res);
+                    if (sortOrder == 'ASC') $(`#${sort}`).attr('data-flag', 'DSC');
+                    else $(`#${sort}`).attr('data-flag', 'ASC');
+                },
+                error: function (err) {
+                    console.log(err.toString());
+                }
+            });
         });
-    });
+    };
 
     //if user searches images by charge than ajax request is called with search parameter in query string
-    $(".search-image").on('click', function () {
-        $.ajax({
-            type: "get",
-            url: getUrl(),
-            success: function (res) {
-                $("#images-page").html(res);
-            },
-            error: function (err) {
-                console.log(err.toString());
-            }
-        });
+    searchImageEventHandler = function () {
+        $(".search-image").on('click', function () {
+            $.ajax({
+                type: "get",
+                url: getUrl(),
+                success: function (res) {
+                    $("#images-page").html(res);
+                },
+                error: function (err) {
+                    console.log(err.toString());
+                }
+            });
 
-    });
+        });
+    };
 
     //when user moves to another page than ajax called 
     //with that selected page value as page parameter in ajax request query string
-    $(".image-wise").on('click', function () {
-        const page = $(this).data("page");
-        $.ajax({
-            type: "get",
-            //calling getUrl function with sort and sortOrder = '' and page parameter as page variable
-            url: getUrl('', '', page),
-            success: function (res) {
-                console.log(res);
-                $("#images-page").html(res);
-            },
-            error: function (err) {
-                console.log(err.toString());
-            }
+    paginationEventHandler = function () {
+        $(".image-wise").on('click', function () {
+            const page = $(this).data("page");
+            $.ajax({
+                type: "get",
+                //calling getUrl function with sort and sortOrder = '' and page parameter as page variable
+                url: getUrl('', '', page),
+                success: function (res) {
+                    $("#images-page").html(res);
+                },
+                error: function (err) {
+                    console.log(err.toString());
+                }
+            });
         });
-    });
+    };
 
     //When user click on clear search option to clear filtered image
     //than this function requests an ajax call and clear the search query parameter to fetch all images records
-    $(".clear-image").on('click', function () {
-        window.location.replace("/gallery");
-    });
-});
+    clearEventHandler = function () {
+        $(".clear-image").on('click', function () {
+            window.location.replace("/gallery");
+        });
+    };
+
+    const _this = this;
+    this.initialize();
+})();

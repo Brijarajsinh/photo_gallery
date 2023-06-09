@@ -42,7 +42,7 @@
                                     <table border="0">
                                         <tr>
                                             <th>
-                                                <div class="nav-item dropdown card-body float-right">
+                                                <div class="nav-item dropdown card-body float-left">
                                                     <label for="filtering">Filter Uploaded Images By
                                                         Date:</label>
                                                     <input type="datetime-local" class="start-date" value={{#if
@@ -53,13 +53,14 @@
                                             </th>
                                             <th>
                                                 <div class="nav-item dropdown card-body float-right">
-                                                    <input type="button" class="btn-danger ml-1 clear-image float-right"
-                                                        value="Clear" />
-                                                    <input type="button"
-                                                        class="btn-primary ml-1 search-image float-right"
+
+                                                    <input type="number" class="search-cost"
+                                                        placeholder="Search by Image Cost"
+                                                        value="{{search.searchCost}}" />
+                                                    <input type="button" class="btn-primary ml-1 search-image"
                                                         value="Search" />
-                                                    <input type="number" class="search-cost float-right"
-                                                        placeholder="Search by Image Cost" />
+                                                    <input type="button" class="btn-danger ml-1 clear-image"
+                                                        value="Clear" />
                                                 </div>
                                             </th>
                                         </tr>
@@ -86,7 +87,7 @@
                                                     <td>{{originalName}}</td>
                                                     <td class="text-center"><img src="/uploads/gallery/{{image}}"
                                                             class="image-upload"></td>
-                                                    <td>{{dateConvert createdAt}}</td>
+                                                    <td>{{dateConvert createdOn}}</td>
                                                     <td>{{charge}}</td>
                                                 </tr>
                                                 {{/each}}
@@ -116,7 +117,7 @@
             {{/each}}
         </ul>
     </nav>
-
-
-    <script src="/javascripts/user/gallery.js"></script>
 </div>
+
+
+<script src="/javascripts/user/gallery.js"></script>

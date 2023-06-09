@@ -5,7 +5,10 @@ require('custom-env').env();
 
 //creating option object for timestamp fields in collection
 const option = {
-    timestamps: true
+    timestamps: {
+        createdAt:'createdOn',
+        updatedAt:'updatedOn'
+    }
 }
 
 //defining transactionSchema with options

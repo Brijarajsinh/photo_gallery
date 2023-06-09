@@ -4,7 +4,11 @@ require('custom-env').env();
 
 //creating option object for timestamp fields in collection
 const option = {
-    timestamps: true
+    collection: 'general-settings',
+    timestamps: {
+        createdAt:'createdOn',
+        updatedAt:'updatedOn'
+    }
 }
 
 //defining settingSchema with options
@@ -32,7 +36,7 @@ const settingSchema = new mongoose.Schema({
 }, option);
 
 //creating model for above described schema
-const settingModel = mongoose.model('generalSettings', settingSchema);
+const settingModel = mongoose.model('general-settings', settingSchema);
 
 //exporting model
 module.exports = settingModel;

@@ -7,7 +7,10 @@ const transactionModel = require('../schema/transactions');
 
 //creating option object for timestamp fields in collection
 const option = {
-    timestamps: true
+    timestamps: {
+        createdAt: 'createdOn',
+        updatedAt: 'updatedOn'
+    }
 }
 
 //defining userSchema with options
@@ -77,7 +80,7 @@ userSchema.pre('save', async function (next) {
             'status': 'credit',
             'amount': `${this.availableCoins}`,
             'type': `welcome-bonus`,
-            'description':`${this.availableCoins} coins are credited for registering in application`
+            'description': `${this.availableCoins} coins are credited for registering in application`
         });
         await transaction.save();
     }

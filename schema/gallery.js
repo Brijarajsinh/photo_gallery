@@ -3,11 +3,15 @@ const { default: mongoose } = require("mongoose");
 
 //creating option object for timestamp fields in collection
 const option = {
-    timestamps: true
+    collection: 'gallery',
+    timestamps: {
+        createdAt:'createdOn',
+        updatedAt:'updatedOn'
+    }
 }
 
-//defining uploadedImages with options
-const uploadedImages = new mongoose.Schema({
+//defining gallery with options
+const gallerySchema = new mongoose.Schema({
     userId: {
         type: mongoose.Schema.Types.ObjectId,
         required: true
@@ -27,7 +31,7 @@ const uploadedImages = new mongoose.Schema({
 }, option);
 
 //creating model for above described schema
-const imageModel = mongoose.model('uploadedImages', uploadedImages);
+const imageModel = mongoose.model('gallery', gallerySchema);
 
 //exporting model
 module.exports = imageModel;

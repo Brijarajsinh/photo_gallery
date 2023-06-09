@@ -36,7 +36,7 @@
                                     <table border="0">
                                         <tr>
                                             <th>
-                                                <div class="nav-item dropdown card-body float-right">
+                                                <div class="nav-item dropdown card-body float-left">
                                                     <label for="filtering">Filter Transactions By
                                                         Status:</label>
                                                     <select class="filter-status">
@@ -51,7 +51,7 @@
                                                 </div>
                                             </th>
                                             <th>
-                                                <div class="nav-item dropdown card-body float-right">
+                                                <div class="nav-item dropdown card-body">
                                                     <label for="filtering">Filter Transactions By Type:</label>
                                                     <select class="filter-type">
                                                         <option value="all">All</option>
@@ -72,15 +72,14 @@
                                             </th>
                                             <th>
                                                 <div class="nav-item dropdown card-body float-right">
-                                                    <input type="button"
-                                                        class="btn-danger ml-1 clear-transaction float-right"
-                                                        value="Clear" />
-                                                    <input type="button"
-                                                        class="btn-primary ml-1 search-transaction float-right"
-                                                        value="Search" />
-                                                    <input type="number" class="search-amount float-right"
+                                                    <input type="number" class="search-amount"
                                                         placeholder="Search by Amount"
                                                         value="{{search.searchAmount}}" />
+                                                    <input type="button" class="btn-primary ml-1 search-transaction"
+                                                        value="Search" />
+
+                                                    <input type="button" class="btn-danger ml-1 clear-transaction"
+                                                        value="Clear" />
                                                 </div>
                                             </th>
                                         </tr>
@@ -102,9 +101,9 @@
                                                 {{#if transactions}}
                                                 {{#each transactions}}
                                                 <tr>
-                                                    <td>{{status}}</td>
-                                                    <td>{{type}}</td>
-                                                    <td>{{amount}}</td>
+                                                    <td class="text-capitalize">{{status}}</td>
+                                                    <td class="text-capitalize">{{replace type "-" " "}} </td>
+                                                    <td class="text-primary">{{amount}}</td>
                                                 </tr>
                                                 {{/each}}
                                                 {{else}}

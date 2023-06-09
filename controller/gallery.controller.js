@@ -1,5 +1,5 @@
 const commonFunction = require('../helpers/function');
-const galleryModel = require('../schema/uploadedImages');
+const galleryModel = require('../schema/gallery');
 const userModel = require('../schema/userSchema');
 const transactionModel = require('../schema/transactions');
 const moment = require('moment');
@@ -8,6 +8,7 @@ const moment = require('moment');
 //getGallery function render gallery page to the client
 exports.getGallery = async (req, res) => {
     try {
+        console.log(await galleryModel.find());
         const search = {};
         const sort = {};
         const find = {
@@ -17,7 +18,7 @@ exports.getGallery = async (req, res) => {
         if (req.query.from && req.query.to) {
             const start = new Date(req.query.from);
             const end = new Date(req.query.to);
-            find.createdAt = {
+            find.createdOn = {
                 "$gte": start,
                 "$lt": end
             }
