@@ -41,9 +41,7 @@ exports.getGallery = async (req, res) => {
 
         const images = await galleryModel.find(find).sort(sort).skip(skip).limit(limit).lean();
         //find total count of users
-        const totalImages = await galleryModel.countDocuments({
-            "userId": req.user._id
-        });
+        const totalImages = await galleryModel.countDocuments(find);
         //generates pages by dividing total images displayed in one page
         const pageCount = Math.ceil(totalImages / limit);
         const page = [];
