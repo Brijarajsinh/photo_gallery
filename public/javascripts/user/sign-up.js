@@ -6,7 +6,7 @@ const signUpHandler = (function () {
     };
 
     signUpEventHandler = function () {
-        $("#btn-submit").on('click', function () {
+        $(document).off('click', '#btn-submit').on('click', '#btn-submit', function () {
             //add jquery validator method to validate password field is strong enough or not
             $.validator.addMethod("strongPassword", function (value) {
                 return /^[A-Za-z0-9\d=!\-@._*]*$/.test(value) // consists of only these

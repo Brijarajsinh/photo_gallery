@@ -35,12 +35,14 @@ const userListHandler = (function () {
     //when Admin searches users by their fname,lname or fullName
     //with that searched value as search parameter is applied in ajax request query string
     searchEventHandler = function () {
-        $(".search-user").on("click", function () {
+        $(document).off('click', '.search-user').on('click', '.search-user', function () {
+
             $.ajax({
                 type: "get",
                 url: getUrl(),
                 success: function (res) {
-                    $("#main").html(res);
+                    const successHtml = $($.parseHTML(res)).filter("#main").html();
+                    $("#main").html(successHtml);
                 },
                 error: function (err) {
                     console.log(err.toString());
@@ -52,7 +54,7 @@ const userListHandler = (function () {
     //when user moves to another page than ajax called 
     //with that selected page value as page parameter in ajax request query string
     paginationEventHandler = function (pge) {
-        $(".user-wise").on('click', function () {
+        $(document).off('click', '.user-wise').on('click', '.user-wise', function () {
             let url = getUrl();
             const page = $(this).data('page');
             url.searchParams.set("page", `${page}`);
@@ -61,7 +63,8 @@ const userListHandler = (function () {
                 type: "get",
                 url: url,
                 success: function (res) {
-                    $("#main").html(res);
+                    const successHtml = $($.parseHTML(res)).filter("#main").html();
+                    $("#main").html(successHtml);
                 },
                 error: function (err) {
                     console.log(err.toString());
@@ -72,7 +75,7 @@ const userListHandler = (function () {
 
     //sorting user list based on admin selection
     sortingEventHandler = function () {
-        $(".sort").on("click", function () {
+        $(document).off('click', '.sort').on('click', '.sort', function () {
             let url = getUrl();
             const sort = $(this).attr(`value`);
             const sortOrder = $(this).attr(`data-flag`);
@@ -84,7 +87,10 @@ const userListHandler = (function () {
                 type: "get",
                 url: url,
                 success: function (res) {
-                    $("#main").html(res);
+
+                    const successHtml = $($.parseHTML(res)).filter("#main").html();
+                    $("#main").html(successHtml);
+
                     if (sortOrder == 'ASC') $(`#${sort}`).attr('data-flag', 'DSC');
                     else $(`#${sort}`).attr('data-flag', 'ASC');
                 },
@@ -98,10 +104,9 @@ const userListHandler = (function () {
     //When user click on clear search option to clear filtered data
     //than this function requests an ajax call and clear the search query parameter to fetch all records
     clearEventHandler = function () {
-        $(".clear-search").on("click", function () {
+        $(document).off('click', '.clear-search').on('click', '.clear-search', function () {
             window.location.replace("/user-list");
         });
-
     }
 
     const _this = this;

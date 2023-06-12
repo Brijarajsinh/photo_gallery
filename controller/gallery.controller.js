@@ -8,7 +8,6 @@ const moment = require('moment');
 //getGallery function render gallery page to the client
 exports.getGallery = async (req, res) => {
     try {
-        console.log(await galleryModel.find());
         const search = {};
         const sort = {};
         const find = {

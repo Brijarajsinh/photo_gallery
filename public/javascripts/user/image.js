@@ -18,7 +18,7 @@ const imageUploadHandler = (function () {
     //when client removes particular selected image than remove that selected image from preview 
     //and also remove that selected file from uploadImage object
     removeImage = function () {
-        $(document).on('click', '.remove-image', function () {
+        $(document).off('click', '.remove-image').on('click', '.remove-image', function () {
             const image = $(this).parent().attr('data-image');
             delete uploadImage[image];
             $("div").find(`[data-image='${image}']`).remove();
@@ -27,7 +27,7 @@ const imageUploadHandler = (function () {
 
     //when client press cancel button for uploading image that redirect client to gallery page
     cancelImageUpload = function () {
-        $(".cancel-upload").on('click', function () {
+        $(document).off('click', '.cancel-upload').on('click', '.cancel-upload', function () {
             window.location.href = 'http://localhost:3000/gallery';
         });
     };
@@ -35,7 +35,8 @@ const imageUploadHandler = (function () {
     //On selection of image to upload a preview of that selected image can be view by client 
     //and object for uploading image will store this selected image
     imageSelection = function () {
-        $("#image").on('change', function () {
+        $(document).off('click', '#image').on('click', '#image', function () {
+
             const input = document.getElementById('image');
             const output = document.getElementById('upload-image-list');
             for (var i = 0; i < input.files.length; ++i) {
@@ -53,7 +54,7 @@ const imageUploadHandler = (function () {
 
     //Store uploaded image in db and redirect to gallery page on successfully uploading
     storeImage = function () {
-        $(".store-image").on('click', function () {
+        $(document).off('click', ".store-image").on('click', ".store-image", function () {
             /*
                 //Validating size of to be uploaded file
                 $.validator.addMethod('filesize', function (value, element, param) {

@@ -6,7 +6,8 @@ const settingsHandler = (function () {
 
     updateSettingEventHandler = function () {
         //validating edit-form of settings using jquery validation method
-        $("#btn-apply").on('click', function () {
+        $(document).off('click', '#btn-apply').on('click', '#btn-apply', function () {
+
             $("#edit-setting-form").validate({
                 keypress: true,
                 errorClass: 'error',

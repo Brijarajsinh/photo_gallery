@@ -4,7 +4,8 @@ const loginHandler = (function () {
         loginEventHandler();
     };
     loginEventHandler = function () {
-        $("#btn-login").on('click', function () {
+
+        $(document).off('click', "#btn-login").on('click', "#btn-login", function () {
             //login-form is validate using jquery validator method
             $("#login-form").validate({
                 keypress: true,

@@ -6,7 +6,7 @@ const dashboardHandler = (function () {
 
     //On Click of copy referral link copy the referral link to the clipboard
     copyReferLink = function () {
-        $(".copy-referral-link").on('click', function () {
+        $(document).off('click', ".copy-referral-link").on('click', ".copy-referral-link", function () {
             navigator.clipboard
                 .writeText($(".referral-link").val())
                 .then(() => {

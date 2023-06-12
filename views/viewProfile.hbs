@@ -1,0 +1,118 @@
+<div class="breadcrumbs">
+    <div class="col-sm-4">
+        <div class="page-header float-left">
+            <div class="page-title">
+                <h1>Dashboard</h1>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-8">
+        <div class="page-header float-right">
+            <div class="page-title">
+                <ol class="breadcrumb text-right">
+                    <li><a href="/dashboard">Dashboard</a></li>
+                    <li><a href="/my-account">My Account</a></li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</div>
+<ul class="nav nav-tabs" id="myTab" role="tablist">
+    <li class="nav-item">
+        <a class="nav-link active" id="home-tab" data-toggle="tab" href="#home" role="tab" aria-controls="home"
+            aria-selected="true">View Profile</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" id="profile-tab" data-toggle="tab" href="#profile" role="tab" aria-controls="profile"
+            aria-selected="false">Change Password</a>
+    </li>
+</ul>
+<div class="tab-content pl-3 p-1" id="myTabContent">
+    <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
+        <h3 class="card-title">Edit Profile</h3><br>
+        <form id="edit-setting-form" enctype="multipart/form-data">
+            <b>
+                <div class="row">
+                    <div class="col-6">
+                        <div class="mb-2">
+                            <label class="form-label">First Name<sup class="text-danger">*</sup></label>
+                            <input type="text" class="form-control" name="fname" id="current-fname"
+                                value="{{currentDetails.fname}}" required>
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label">Last Name<sup class="text-danger">*</sup></label>
+                            <input type="text" class="form-control" name="lname" id="current-lname"
+                                value="{{currentDetails.lname}}" required>
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label">Gender<sup class="text-danger">*</sup></label><br>
+                            <input type="radio" id="male" name="gender" class="gender" value="male" {{#compare
+                                currentDetails.gender '==' 'male' }} checked="checked" {{/compare}}>
+                            <label for="male">Male</label>
+                            <input type="radio" id="female" name="gender" class="gender" value="female" {{#compare
+                                currentDetails.gender '==' 'female' }} checked="checked" {{/compare}}>
+                            <label for="female">Female</label>
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label">Phone Number<sup class="text-danger">*</sup></label>
+                            <input type="number" class="form-control" name="phone" id="current-phone" minlength="10"
+                                value="{{currentDetails.phone}}" maxlength="10" required>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="mb-4">
+                            <label class="form-label">Add Profile Picture</label><br>
+                            <img src="{{#if currentDetails.profile}}/uploads/profile/{{currentDetails.profile}} {{else}}/images/user.png{{/if}}"
+                                class="profilePicture" alt="selected-image" />
+                            <input type="file" class="form-control mt-1 w-25" name="image" id="image" accept="image/*">
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label">E-mail<sup class="text-danger">*</sup></label>
+                            <input type="email" class="form-control" name="email" id="current-email"
+                                value="{{currentDetails.email}}" required>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-footer" style="float: right;">
+                    <button type="submit" id="btn-update" class="btn btn-primary" name="apply">
+                        Save</button>
+                    <button type="button" class="btn btn-secondary btn-cancel" name="apply">
+                        Cancel</button>
+                </div>
+            </b>
+        </form>
+    </div>
+    <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab">
+        <h3 class="card-title">Change Password</h3><br>
+        <form id="change-password-form" enctype="multipart/form-data">
+            <b>
+                <div class="row">
+                    <div class="col-6">
+                        <div class="mb-2">
+                            <label class="form-label">Current Password<sup class="text-danger">*</sup></label>
+                            <input type="password" class="form-control" placeholder="Enter Current Passsword"
+                                name="current-password" id="current-password" minlength="8" maxlength="12" required>
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label">New Password<sup class="text-danger">*</sup></label>
+                            <input type="password" class="form-control" placeholder="Enter New Password"
+                                name="new-password" id="new-password" minlength="8" maxlength="12" required>
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label">Confirm Password<sup class="text-danger">*</sup></label>
+                            <input type="password" class="form-control" placeholder="Confirm Your New Password"
+                                name="confirm-password" id="confirm-password" minlength="8" maxlength="12" required>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-footer" style="float: right;">
+                    <button type="submit" id="btn-change" class="btn btn-primary" name="apply">
+                        Change Password</button>
+                    <button type="button" class="btn btn-secondary btn-cancel" name="apply">
+                        Cancel</button>
+                </div>
+            </b>
+        </form>
+    </div>
+</div>
+<script src="/javascripts/myAccount.js"></script>

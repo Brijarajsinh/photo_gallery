@@ -76,7 +76,8 @@ module.exports = {
                     role: 1,
                     fullName: 1,
                     referLink: 1,
-                    availableCoins: 1
+                    availableCoins: 1,
+                    profile: 1
                 }).lean();
 
                 console.log("deserializeUser");

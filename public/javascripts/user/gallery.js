@@ -48,15 +48,17 @@ const galleryHandler = (function () {
 
     //sorting on images  based on user selection
     sortImageEventHandler = function () {
-        $(".sort").on('click', function () {
+        $(document).off('click', '.sort').on('click', '.sort', function () {
             const sort = $(this).attr(`value`);
             const sortOrder = $(this).attr(`data-flag`);
             $.ajax({
                 type: "get",
                 url: getUrl(sort, sortOrder),
                 success: function (res) {
-                    $("#images-page").html(res);
-                    console.log(res);
+
+                    const successHtml = $($.parseHTML(res)).filter("#images-page").html();
+                    $("#images-page").html(successHtml);
+
                     if (sortOrder == 'ASC') $(`#${sort}`).attr('data-flag', 'DSC');
                     else $(`#${sort}`).attr('data-flag', 'ASC');
                 },
@@ -69,12 +71,13 @@ const galleryHandler = (function () {
 
     //if user searches images by charge than ajax request is called with search parameter in query string
     searchImageEventHandler = function () {
-        $(".search-image").on('click', function () {
+        $(document).off('click', '.search-image').on('click', '.search-image', function () {
             $.ajax({
                 type: "get",
                 url: getUrl(),
                 success: function (res) {
-                    $("#images-page").html(res);
+                    const successHtml = $($.parseHTML(res)).filter("#images-page").html();
+                    $("#images-page").html(successHtml);
                 },
                 error: function (err) {
                     console.log(err.toString());
@@ -87,14 +90,16 @@ const galleryHandler = (function () {
     //when user moves to another page than ajax called 
     //with that selected page value as page parameter in ajax request query string
     paginationEventHandler = function () {
-        $(".image-wise").on('click', function () {
+
+        $(document).off('click', '.image-wise').on('click', '.image-wise', function () {
             const page = $(this).data("page");
             $.ajax({
                 type: "get",
                 //calling getUrl function with sort and sortOrder = '' and page parameter as page variable
                 url: getUrl('', '', page),
                 success: function (res) {
-                    $("#images-page").html(res);
+                    const successHtml = $($.parseHTML(res)).filter("#images-page").html();
+                    $("#images-page").html(successHtml);
                 },
                 error: function (err) {
                     console.log(err.toString());
@@ -106,7 +111,7 @@ const galleryHandler = (function () {
     //When user click on clear search option to clear filtered image
     //than this function requests an ajax call and clear the search query parameter to fetch all images records
     clearEventHandler = function () {
-        $(".clear-image").on('click', function () {
+        $(document).off('click', '.clear-image').on('click', '.clear-image', function () {
             window.location.replace("/gallery");
         });
     };

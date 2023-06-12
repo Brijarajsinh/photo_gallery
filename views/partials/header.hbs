@@ -1,43 +1,28 @@
 <!-- Header-->
 <header id="header" class="header">
     <div class="header-menu">
-        {{#compare user.role '==' 'admin'}}
         <div class="col-sm-7">
             <a id="menuToggle" class="menutoggle pull-left"><i class="fa fa fa-tasks"></i></a>
             <b>
-                <div class="mt-1">Welcome Admin in Photo gallery</div>
+                <div class="mt-1">Welcome{{#compare user.role '==' 'admin'}} Admin{{/compare}}{{#compare user.role '=='
+                    'user'}} User{{/compare}} in Photo gallery</div>
             </b>
         </div>
         <div class="col-sm-5">
             <div class="user-area dropdown float-right">
-                <a href="javascript:void(0);" class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    <img class="user-avatar rounded-circle" src="/images/admin.jpeg" alt="Admin-Image">
+                <a href="javascript:void(0);" class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true"
+                    aria-expanded="false">
+                    <img class="user-avatar rounded-circle"
+                        src="{{#if user.profile}}/uploads/profile/{{user.profile}} {{else}}/images/user.png{{/if}}"
+                        alt="Admin-Image">
                 </a>
-                <div class="user-menu dropdown-menu">
-                    <a class="nav-link" href="/logout"><i class="fa fa-power-off"></i> Logout</a>
-                </div>
-            </div>
-        </div>
-        {{/compare}}
 
-        {{#compare user.role '==' 'user'}}
-        <div class="col-sm-7">
-            <a id="menuToggle" class="menutoggle pull-left"><i class="fa fa fa-tasks"></i></a>
-            <b>
-                <div class="mt-1">Welcome User in Photo gallery</div>
-            </b>
-        </div>
-        <div class="col-sm-5">
-            <div class="user-area dropdown float-right">
-                <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    <img class="user-avatar rounded-circle" src="/images/user.png" alt="User-Image">
-                </a>
                 <div class="user-menu dropdown-menu">
+                    <a class="nav-link" href="/my-account"><i class="fa fa-user"></i> MyAccount</a>
                     <a class="nav-link" href="/logout"><i class="fa fa-power-off"></i> Logout</a>
                 </div>
             </div>
         </div>
-        {{/compare}}
     </div>
 </header><!-- /header -->
 <!-- Header-->

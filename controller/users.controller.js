@@ -115,6 +115,13 @@ exports.checkEmail = async (req, res) => {
     const condition = {
         email: req.query.email
     }
+
+    //if this route is called after login than checks unique email excluding current logged-in user's email
+    if (req.user) {
+        condition["_id"] = {
+            $ne: req.user._id
+        }
+    }
     const exist = await userModel.countDocuments(condition);
     //if e-mail is already registered by other user than return false
     if (exist) return res.send(false);
