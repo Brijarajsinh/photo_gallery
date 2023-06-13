@@ -74,7 +74,6 @@ const signUpHandler = (function () {
                         required: 'E-mail is required',
                         remote: 'E-mail is already Registered',
                         email: 'Please Enter Valid E-mail'
-
                     },
                     "gender": {
                         required: 'Select Gender'

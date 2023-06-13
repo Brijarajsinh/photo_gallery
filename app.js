@@ -17,6 +17,7 @@ const userListRouter = require('./routes/userList');
 const galleryRouter = require('./routes/gallery');
 const transactionRouter = require('./routes/transaction');
 const profileRouter = require('./routes/profile');
+const withdrawRouter = require('./routes/withdraw');
 const moment = require('moment');
 //Requiring Flash
 const flash = require('connect-flash');
@@ -40,10 +41,10 @@ const hbs = exHbs.create({
       return moment(date1).format('DD/MM/YYYY, h:mm a');
     },
     endDate: function () {
-      return moment(Date.now()).format('yy-MM-DDTHH:mm');
+      return moment(Date.now()).format('yy-MM-DDTHH:mm:ss');
     },
     startDate: function () {
-      return moment(Date.now()).subtract(6, 'd').format('yy-MM-DDTHH:mm');
+      return moment(Date.now()).subtract(6, 'd').format('yy-MM-DDTHH:mm:ss');
     }
   }
 });
@@ -102,6 +103,7 @@ app.use('/user-list', userListRouter);
 app.use('/gallery', galleryRouter);
 app.use('/transaction', transactionRouter);
 app.use('/my-account',profileRouter);
+app.use('/withdraw',withdrawRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

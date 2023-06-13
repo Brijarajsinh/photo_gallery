@@ -24,7 +24,7 @@ exports.getGallery = async (req, res) => {
         const pageSkip = (Number(req.query.page)) ? Number(req.query.page) : 1;
         const limit = 2;
         const skip = (pageSkip - 1) * limit;
-        
+
         if (req.query.charge) {
             //if user wants to search transaction by charge than searching is applied while fetching transactions records
             find['charge'] = req.query.charge;
