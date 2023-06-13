@@ -3,15 +3,13 @@ const galleryModel = require('../schema/gallery');
 const userModel = require('../schema/userSchema');
 const transactionModel = require('../schema/transactions');
 const { createImgArray } = require('../services/user.services');
-
+const galleryService = require('../services/gallery.services');
 //getGallery function render gallery page to the client
 exports.getGallery = async (req, res) => {
     try {
-        const search = {};
-        const sort = {};
-        const find = {
-            "userId": req.user._id
-        };
+        const find = await galleryService.findObjImages(req.user._id, req.query);
+        const search = await galleryService.searchedDetails(req.query);
+        const sort = await galleryService.sortObj(req.query.sort, req.query.sortOrder);
 
         if (req.query.from && req.query.to) {
             const start = new Date(req.query.from);
@@ -26,12 +24,7 @@ exports.getGallery = async (req, res) => {
         const pageSkip = (Number(req.query.page)) ? Number(req.query.page) : 1;
         const limit = 2;
         const skip = (pageSkip - 1) * limit;
-        if (req.query.sort) {
-            sort[req.query.sort] = req.query.sortOrder == 'ASC' ? 1 : -1
-        }
-        else {
-            sort._id = -1;
-        }
+        
         if (req.query.charge) {
             //if user wants to search transaction by charge than searching is applied while fetching transactions records
             find['charge'] = req.query.charge;
@@ -43,10 +36,7 @@ exports.getGallery = async (req, res) => {
         const totalImages = await galleryModel.countDocuments(find);
         //generates pages by dividing total images displayed in one page
         const pageCount = Math.ceil(totalImages / limit);
-        const page = [];
-        for (let i = 1; i <= pageCount; i++) {
-            page.push(i);
-        }
+        const page = await commonFunction.createPagination(pageCount);
 
         const response = {
             title: 'Gallery',
@@ -113,10 +103,8 @@ exports.uploadImage = async (req, res) => {
         //else upload multiple image in single mongoose query
         else {
             const uploadImages = await createImgArray(imageCount, req.user._id, req.files, uploadCharge);
-
             //insert multiple documents in image collection if available balance is valid for uploading requested images
             await galleryModel.insertMany(uploadImages);
-
             //deduct the uploading charge from user's wallet by updating availableCoins
             await userModel.updateOne({
                 "_id": req.user._id
