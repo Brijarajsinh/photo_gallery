@@ -1,6 +1,8 @@
 //requiring model to work with collection of that models
 const settingModel = require('../schema/generalSettings');
 const userModel = require('../schema/userSchema');
+const functionUsage = require('../helpers/function');
+
 
 //applySettings function updates general settings
 const { applySettings } = require('../helpers/function');
@@ -12,7 +14,6 @@ const { getSettings } = require('../helpers/function');
 //getGeneralSettings function fetches current general-settings
 exports.getGeneralSettings = async (req, res, next) => {
     try {
-        console.log(await settingModel.findOne());
         const currentDetails = await getSettings();
         res.render('admin/settings', {
             title: 'Settings',
@@ -79,7 +80,7 @@ exports.getUserList = async (req, res) => {
             sort[req.query.sort] = req.query.sortOrder == 'ASC' ? 1 : -1
         }
         else {
-            sort._id = 1
+            sort._id = -1
         }
         const currentUsers = await userModel.find(
             find
@@ -95,36 +96,22 @@ exports.getUserList = async (req, res) => {
         const totalUsers = await userModel.countDocuments(
             find
         );
-
         //generates pages by dividing total users displayed in one page
         const pageCount = Math.ceil(totalUsers / limit);
-        const page = [];
-        for (let i = 1; i <= pageCount; i++) {
-            page.push(i);
+        const page = await functionUsage.createPagination(pageCount);
+        const response = {
+            title: 'Users',
+            users: currentUsers,
+            page: page,
+            currentPage: pageSkip
         }
-        //if this route is called using ajax request than load data through partials
+        //if this route is called using ajax request than load data through blank layout
         if (req.xhr) {
-
-            //render userList page to display list of users
-            res.render('admin/user-list', {
-                title: 'Users',
-                users: currentUsers,
-                page: page,
-                layout: 'blank',
-                searchValue: req.query.search,
-                currentPage: pageSkip
-            });
+            response['layout'] = 'blank';
+            response['searchValue'] = req.query.search;
         }
-        //otherwise load data through rendering report page
-        else {
-            //render userList page to display list of users
-            res.render('admin/user-list', {
-                title: 'Users',
-                users: currentUsers,
-                page: page,
-                currentPage: pageSkip
-            });
-        }
+        //otherwise load data through main layout
+        res.render('admin/user-list', response);
     } catch (error) {
         console.log("Error Generated While Admin access userList Page");
         console.log(error);

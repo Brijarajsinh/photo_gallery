@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const multer = require('multer');
 const path = require('path');
-const commonController = require('../controller/account.controller');
+const profileController = require('../controller/account.controller');
 
 //specifies storage location to store uploaded profile picture
 const imageStorage = multer.diskStorage({
@@ -25,13 +25,13 @@ const image = multer({
 });
 
 //Get Route to render my-account page with before
-router.get('/', commonController.getProfileDetails);
+router.get('/', profileController.getProfileDetails);
 
 //put route to edit user details in users collection
-router.put('/edit-profile', image.single('profile'), commonController.editProfileDetails);
+router.put('/edit-profile', image.single('profile'), profileController.editProfileDetails);
 
 //put route to edit user's password  in users collection
-router.put('/change-password',commonController.changePassword);
+router.put('/change-password',profileController.changePassword);
 
 module.exports = router;
 

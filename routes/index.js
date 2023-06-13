@@ -1,20 +1,20 @@
 //requiring necessary packages
 const express = require('express');
 const router = express.Router();
-const commonController = require('../controller/users.controller');
+const userController = require('../controller/users.controller');
 /* GET home page. */
 
 //Get Route to render login page with before login layout
-router.get('/', commonController.loginPage);
+router.get('/', userController.loginPage);
 
 //GET Route to Logout user and clearing user details from browser's cookies
-router.get('/logout',commonController.logout);
+router.get('/logout',userController.logout);
 
 //GET Route to check e-mail field's value is already registered or not
 //this route is called using jquery validator method of remote
-router.get('/check-email',commonController.checkEmail);
+router.get('/check-email',userController.checkEmail);
 
 //sign-up route to render Registration page
-router.get('/sign-up',commonController.signUp);
+router.get('/sign-up',userController.signUp);
 
 module.exports = router;

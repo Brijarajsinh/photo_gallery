@@ -2,8 +2,7 @@ const commonFunction = require('../helpers/function');
 const galleryModel = require('../schema/gallery');
 const userModel = require('../schema/userSchema');
 const transactionModel = require('../schema/transactions');
-const moment = require('moment');
-
+const { createImgArray } = require('../services/user.services');
 
 //getGallery function render gallery page to the client
 exports.getGallery = async (req, res) => {
@@ -48,28 +47,22 @@ exports.getGallery = async (req, res) => {
         for (let i = 1; i <= pageCount; i++) {
             page.push(i);
         }
+
+        const response = {
+            title: 'Gallery',
+            images: images,
+            page: page,
+            currentPage: pageSkip
+        }
         //if this route is called using ajax request than load data through partials
         if (req.xhr) {
             //render  user/gallery  to display uploaded post by user with blank layout
-            res.render('user/gallery', {
-                title: 'Gallery',
-                images: images,
-                page: page,
-                layout: 'blank',
-                currentPage: pageSkip,
-                search: search
-            });
+            response['layout'] = 'blank';
+            response['search'] = search;
         }
-        //otherwise load data through rendering gallery page
-        else {
-            //render  user/gallery  to display uploaded post by user
-            res.render('user/gallery', {
-                title: 'Gallery',
-                images: images,
-                page: page,
-                currentPage: pageSkip
-            });
-        }
+        //otherwise load data through main layout
+        //render  user/gallery  to display uploaded post by user
+        res.render('user/gallery', response);
     } catch (error) {
         console.log("Error Generated While rendering gallery page");
         console.log(error);
@@ -96,8 +89,8 @@ exports.getUploadImagePage = async (req, res) => {
     }
 }
 
-//uploadImageController function store uploaded image in db 
-exports.uploadImageController = async (req, res) => {
+//uploadImage function store uploaded image in db 
+exports.uploadImage = async (req, res) => {
     try {
         //count total requested image to be upload by client
         const imageCount = req.files.length;
@@ -105,7 +98,7 @@ exports.uploadImageController = async (req, res) => {
         //fetch image uploading charge from general setting collection
         const uploadCharge = await commonFunction.getImageUploadCharge();
 
-        //Fetch 
+        //Fetch available coins in wallet of logged-in user
         const availableCoins = req.user.availableCoins;
         const charge = imageCount * uploadCharge;
 
@@ -119,16 +112,7 @@ exports.uploadImageController = async (req, res) => {
         }
         //else upload multiple image in single mongoose query
         else {
-            const uploadImages = [];
-            for (let i = 0; i < imageCount; i++) {
-                const imageDetails = {
-                    "userId": req.user._id,
-                    "image": req.files[i].filename,
-                    "originalName": req.files[i].originalname,
-                    "charge": uploadCharge
-                };
-                uploadImages.push(imageDetails);
-            }
+            const uploadImages = await createImgArray(imageCount, req.user._id, req.files, uploadCharge);
 
             //insert multiple documents in image collection if available balance is valid for uploading requested images
             await galleryModel.insertMany(uploadImages);
@@ -153,6 +137,11 @@ exports.uploadImageController = async (req, res) => {
             });
             await transaction.save();
 
+            //using socket.io send notification to the admin that user uploaded an image
+            io.to('adminRoom').emit('imageUpload', {
+                'userName': req.user.fullName
+            });
+
             //send response type="success"
             const response = {
                 type: 'success'
@@ -161,7 +150,7 @@ exports.uploadImageController = async (req, res) => {
         }
     } catch (error) {
         console.log("Error Generated in uploading image");
-        console.log(error.toString());
+        console.log(error);
         res.send({
             type: 'error',
             message: error.toString()

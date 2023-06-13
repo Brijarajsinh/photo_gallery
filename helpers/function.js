@@ -21,7 +21,7 @@ module.exports = {
         return forge.md.sha512.sha256.create().update(password).digest().toHex();
     },
 
-
+    //returns the current applied general-setting
     getSettings:async function(){
        return await settingModel.findOne({}, {
             "_id": 0,
@@ -30,7 +30,6 @@ module.exports = {
             "referralBonus": 1,
             "welcomeBonus": 1
         }).lean();
-        
     },
     
     //applySettings function returns updated settings value's object with key
@@ -139,5 +138,14 @@ module.exports = {
             return next();
         }
         return res.redirect('/dashboard');
+    },
+
+    //returns the pagination array 
+    createPagination:async function(pages){
+        const page = [];
+        for (let i = 1; i <= pages; i++) {
+            page.push(i);
+        }
+        return page;
     }
 }

@@ -93,13 +93,12 @@ const accountHandler = (function () {
                 },
                 //on submit of registration-form validate user entered details using jquery validator
                 submitHandler: function () {
-
                     //append the user entered details in formData object
                     const formData = new FormData();
                     formData.append('fname', $("#current-fname").val().trim());
                     formData.append('lname', $("#current-lname").val().trim());
                     formData.append('email', $("#current-email").val().trim());
-                    formData.append('gender', $('input[type=radio]').val());
+                    formData.append('gender', $('input[name=updatedGender]:checked').val());
                     formData.append('phone', $('#current-phone').val());
                     formData.append('profile', $("#image")[0].files[0]);
 

@@ -2,7 +2,7 @@
 const userModel = require('../schema/userSchema');
 const path = require('path');
 const functionUsage = require('../helpers/function');
-
+const { updatedDetails } = require('../services/user.services');
 //Fetches the current logged-in user's details from the users collection
 exports.getProfileDetails = async (req, res) => {
     try {
@@ -34,14 +34,7 @@ exports.getProfileDetails = async (req, res) => {
 exports.editProfileDetails = async (req, res) => {
     try {
         //preparing updatedUser object to set the updated details in update query
-        const updatedUser = {
-            'fname': req.body.fname,
-            'lname': req.body.lname,
-            'email': req.body.email,
-            'gender': req.body.gender,
-            'phone': req.body.phone,
-            'fullName': `${req.body.fname} ${req.body.lname}`
-        }
+        const updatedUser = await updatedDetails(req.body);
 
         //if logged-in user add or edit's profile picture than add that requested file in update obj
         if (req.file) updatedUser['profile'] = path.basename(req.file.path);
@@ -68,6 +61,7 @@ exports.editProfileDetails = async (req, res) => {
 //changes the password of logged-in user
 exports.changePassword = async (req, res) => {
     try {
+        const newPassword = await functionUsage.generatePasswordHash(req.body.newPassword);
         const currentPassword = await userModel.findOne({
             "_id": req.user._id
         }, {
@@ -78,18 +72,23 @@ exports.changePassword = async (req, res) => {
         if (currentPassword.password != await functionUsage.generatePasswordHash(req.body.currentPassword)) {
             throw "Current Password Not Matched"
         }
-        //else update the new password in db
+        //if user try to set new password same as old password than throw error from here
+        else if (currentPassword.password == newPassword) {
+            throw "You Can't set new password same to old password."
+        }
+        //else update the new password in users collection
         else {
             await userModel.updateOne({
                 "_id": req.user._id
             }, {
-                "password": await functionUsage.generatePasswordHash(req.body.newPassword)
+                "password": newPassword
             });
             res.send({
                 type: 'success'
             });
         }
     } catch (error) {
+        //If Error Generated While User Change password Process Than This Catch Block Will Executed
         console.log("Error Generated While User Change password");
         console.log(error);
         res.send({

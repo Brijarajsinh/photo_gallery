@@ -1,6 +1,6 @@
 //uploadImage object consists all user selected images
-const uploadImage = {}
 const imageUploadHandler = (function () {
+    const uploadImage = {}
     this.initialize = function () {
         //remove selected image for uploading
         removeImage();
@@ -35,8 +35,7 @@ const imageUploadHandler = (function () {
     //On selection of image to upload a preview of that selected image can be view by client 
     //and object for uploading image will store this selected image
     imageSelection = function () {
-        $(document).off('click', '#image').on('click', '#image', function () {
-
+        $(document).off('change', '#image').on('change', '#image', function () {
             const input = document.getElementById('image');
             const output = document.getElementById('upload-image-list');
             for (var i = 0; i < input.files.length; ++i) {

@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html>
-
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -27,6 +26,7 @@
   <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,600,700,800' rel='stylesheet' type='text/css'>
 
   <script src="/javascripts/toastr.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.6.2/socket.io.js"></script>
   <link href="/stylesheets/toastr.css" rel="stylesheet" />
   <style>
     form .error {
@@ -38,7 +38,7 @@
       width: 100px;
     }
 
-    .profilePicture{
+    .profilePicture {
       height: 130px;
       width: 130px;
     }
@@ -68,15 +68,42 @@
   <script src="/assets/js/main.js"></script>
   {{!--
   <script src="/assets/vendors/chart.js/dist/Chart.bundle.min.js"></script> --}}
-  {{!-- <script src="/assets/js/dashboard.js"></script> --}}
-  {{!-- <script src="/assets/js/widgets.js"></script> --}}
-  {{!-- <script src="/assets/vendors/jqvmap/dist/jquery.vmap.min.js"></script> --}}
-  {{!-- <script src="/assets/vendors/jqvmap/examples/js/jquery.vmap.sampledata.js"></script> --}}
-  {{!-- <script src="/assets/vendors/jqvmap/dist/maps/jquery.vmap.world.js"></script> --}}
+  {{!--
+  <script src="/assets/js/dashboard.js"></script> --}}
+  {{!--
+  <script src="/assets/js/widgets.js"></script> --}}
+  {{!--
+  <script src="/assets/vendors/jqvmap/dist/jquery.vmap.min.js"></script> --}}
+  {{!--
+  <script src="/assets/vendors/jqvmap/examples/js/jquery.vmap.sampledata.js"></script> --}}
+  {{!--
+  <script src="/assets/vendors/jqvmap/dist/maps/jquery.vmap.world.js"></script> --}}
   <script>
+
+    //if user's role is admin than user will join adminRoom of socket to get notification on image upload
+    if ("{{user.role}}" == 'admin') {
+      const socket = io({
+        query: { "RoomID": "adminRoom" }
+      });
+      socket.on("imageUpload", (data) => {
+        toastr.success(`Image Uploaded by ${data.userName}`);
+      });
+    }
+
+    //else if user's role is user than user will join userRoom of socket to get notification on reference user's registration
+    else if ("{{user.role}}" == 'user') {
+      const socket = io({
+        query: { "RoomID": "userRoom" }
+      });
+      socket.on("registerWithReferLink", (data) => {
+        if ("{{user._id}}" == data.referredBy) {
+          toastr.success(`${data.userName} registered with your referral link`);
+        }
+      });
+    }
+
     (function ($) {
       "use strict";
-
       /**jQuery('#vmap').vectorMap({
         map: 'world_en',
         backgroundColor: null,
