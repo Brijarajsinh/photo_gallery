@@ -160,7 +160,7 @@ const withdrawRequestHandler = (function () {
         })
     }
     searchRequestEventHandler = function () {
-        $(document).off('click', '.search-request').on('click', '.search-request', function () {
+        $(document).off('click', '.search-list').on('click', '.search-list', function () {
             $.ajax({
                 type: "get",
                 url: getUrl(),
@@ -192,7 +192,7 @@ const withdrawRequestHandler = (function () {
         });
     };
     clearEventHandler = function () {
-        $(document).off('click', '.clear-request').on('click', '.clear-request', function () {
+        $(document).off('click', '.clear-list').on('click', '.clear-list', function () {
             window.location.replace("/withdraw/list");
         });
     };

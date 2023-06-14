@@ -1,126 +1,16 @@
 const express = require('express');
 const router = express.Router();
 const { checkUser, checkAdmin } = require('../helpers/function');
-const withdrawModel = require('../schema/withdraw');
-const UserModel = require('../schema/userSchema');
-const transactionModel = require('../schema/transactions');
-const commonFunction = require('../helpers/function');
+const withdrawController = require('../controller/withdraw.controller');
 
-router.get('/request', async function (req, res) {
-    try {
-        console.log("QUERY");
-        console.log(req.query);
-        console.log("BODY");
-        console.log(req.body);
-        // const find = await galleryService.findObjImages(req.user._id, req.query);
-        // const search = await galleryService.searchedDetails(req.query);
-        // const sort = await galleryService.sortObj(req.query.sort, req.query.sortOrder);
-        // const sort = {
-        //     "_id": -1
-        // }
-        const find = {}
-        const search = {}
-        const sort = {}
+//get Route /withdraw/request get all request to the admin
+router.get('/request', checkAdmin,withdrawController.getWithdrawRequestAdminSide);
 
-        if (req.query.sort) {
-            sort[`${req.query.sort}`] = req.query.sortOrder == 'ASC' ? 1 : -1
-        }
-        else {
-            sort['_id'] = -1;
-        }
-        if (req.query.from && req.query.to) {
-            const start = new Date(req.query.from);
-            const end = new Date(req.query.to);
-            console.log(start, end);
-            find.createdOn = {
-                $gte: start,
-                $lt: end
-            }
-            search['from'] = req.query.from;
-            search['to'] = req.query.to;
-        }
+//get Route /withdraw/list get aall request of logged-in user
+router.get('/list', checkUser,withdrawController.getWithdrawRequestUserSide);
 
-        if (req.query.status) {
-            find['status'] = req.query.status
-            search['filterType'] = req.query.status
-        }
-        else {
-            search['filterType'] = 'all'
-        }
-        const pageSkip = (Number(req.query.page)) ? Number(req.query.page) : 1;
-        const limit = 2;
-        const skip = (pageSkip - 1) * limit;
-        if (req.user.role == 'admin') {
-            find['status'] = 'pending';
-        }
-        else {
-            find['userId'] = req.user._id
-        }
-        const withdrawRequest = await withdrawModel.find(find, {
-            "_id": 1,
-            "userId": 1,
-            "createdOn": 1,
-            "amount": 1,
-            "status": 1,
-        }).sort(sort).skip(skip).limit(limit).lean();
-        console.log("ANSWER ANSWER ANSWER");
-        console.log(find);
-        console.log(withdrawRequest);
-        const totalRequests = await withdrawModel.countDocuments(find);
-        const pageCount = Math.ceil(totalRequests / limit);
-        const page = await commonFunction.createPagination(pageCount);
-
-        const response = {
-            title: 'Withdraw',
-            requests: withdrawRequest,
-            page: page,
-            currentPage: pageSkip
-        }
-
-        if (req.xhr) {
-            response['layout'] = 'blank';
-            response['search'] = search;
-        }
-        if (req.user.role == 'admin') {
-            res.render('admin/withdraw', response);
-        }
-        else {
-            res.render('user/withdraw', response);
-        }
-    } catch (error) {
-        console.log("Error Generated In rendering Withdraw Page");
-        console.log(error);
-        res.send({
-            type: 'error',
-            message: error.toString()
-        });
-    }
-});
-
-router.post('/', checkUser, async function (req, res) {
-    try {
-        const withdrawRecord = new withdrawModel({
-            "userId": req.user._id,
-            "amount": req.body.amount
-        });
-        await withdrawRecord.save();
-
-        //using socket.io send notification to the user that admin uploads withdraw request status to rejected from pending
-        io.to('adminRoom').emit('withdrawRequest', {
-            'userName': req.user.fullName
-        });
-        res.send({
-            type: 'success'
-        });
-    } catch (error) {
-        console.log("Error generated In Withdraw Request");
-        console.log(error);
-        res.send({
-            type: 'error',
-            message: error.toString()
-        });
-    }
-});
+//post Route /withdraw to add withdraw request of user
+router.post('/', checkUser,withdrawController.withdrawCoinRequest);
 
 router.put('/', async function (req, res) {
     try {
@@ -172,13 +62,13 @@ router.put('/', async function (req, res) {
             }, requestDetails);
         }
         if (req.user.role == 'admin') {
-            res.render('admin/withdraw',{
-                layout:'blank'
+            res.render('admin/withdraw', {
+                layout: 'blank'
             });
         }
         else {
-            res.render('user/withdraw',{
-                layout:'blank'
+            res.render('user/withdraw', {
+                layout: 'blank'
             });
         }
     } catch (error) {
