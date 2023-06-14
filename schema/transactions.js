@@ -28,7 +28,7 @@ const transactionSchema = new mongoose.Schema({
     },
     type: {
         type: String,
-        enum: ['welcome-bonus', 'referral-bonus', 'image-deduction'],
+        enum: ['welcome-bonus', 'referral-bonus', 'image-deduction','withdrawal'],
         default: 'image-deduction'
     },
     description: {

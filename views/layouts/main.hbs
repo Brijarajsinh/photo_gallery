@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -62,6 +63,10 @@
 
   </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+  {{!--
+  <script src="https://unpkg.com/sweetalert2@7.8.2/dist/sweetalert2.all.js"></script> --}}
   <script src="/assets/vendors/jquery/dist/jquery.min.js"></script>
   <script src="/assets/vendors/popper.js/dist/umd/popper.min.js"></script>
   <script src="/assets/vendors/bootstrap/dist/js/bootstrap.min.js"></script>
@@ -88,6 +93,10 @@
       socket.on("imageUpload", (data) => {
         toastr.success(`Image Uploaded by ${data.userName}`);
       });
+
+      socket.on("withdrawRequest", (data) => {
+        toastr.success(`Withdraw Requested by ${data.userName}`);
+      });
     }
 
     //else if user's role is user than user will join userRoom of socket to get notification on reference user's registration
@@ -100,6 +109,13 @@
           toastr.success(`${data.userName} registered with your referral link`);
         }
       });
+
+      socket.on("requestUpdate", (data) => {
+        if ("{{user._id}}" == data.userId) {
+          toastr.success(`${data.message}`);
+        }
+      });
+
     }
 
     (function ($) {

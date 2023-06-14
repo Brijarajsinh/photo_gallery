@@ -41,10 +41,10 @@ const hbs = exHbs.create({
       return moment(date1).format('DD/MM/YYYY, h:mm a');
     },
     endDate: function () {
-      return moment(Date.now()).format('yy-MM-DDTHH:mm:ss');
+      return moment(Date.now()).format('yy-MM-DDTHH:mm');
     },
     startDate: function () {
-      return moment(Date.now()).subtract(6, 'd').format('yy-MM-DDTHH:mm:ss');
+      return moment(Date.now()).subtract(6, 'd').format('yy-MM-DDTHH:mm');
     }
   }
 });
