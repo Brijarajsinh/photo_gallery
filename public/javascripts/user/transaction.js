@@ -28,7 +28,6 @@ const transactionHandler = (function () {
         else {
             url.searchParams.set("amount", "");
         }
-
         //if user filter's transactions by status like credit and debit 
         // than this status passed in query parameter of url
         if (filterStatus) url.searchParams.set("status", `${filterStatus}`);

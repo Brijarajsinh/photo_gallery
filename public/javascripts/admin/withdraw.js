@@ -32,22 +32,33 @@ const withdrawRequestHandler = (function () {
                 confirmButtonText: 'Yes, Approve it!',
                 allowOutsideClick: false,
                 allowEscapeKey: false,
+                // showLoaderOnConfirm: true
             }).then((result) => {
                 if (result.isConfirmed) {
                     const data = {
-                        reqId: $(this).attr('id'),
-                        status: "approved",
                         amount: $(this).attr('data-amount'),
                         userId: $(this).attr('data-user-id')
                     }
                     $.ajax({
                         type: 'put',
-                        url: '/withdraw',
+                        url: `/withdraw/admin/request/${$(this).attr('id')}/${$(this).attr('data-status')}`,
                         data: data,
                         async: true,
                         success: function (res) {
-                            const successHtml = $($.parseHTML(res)).filter("#withdraw-request-page").html();
-                            $("#withdraw-request-page").html(successHtml);
+                            if (res.type == 'success') {
+                                $(`#${res.reqId}`).html(`<button type="button" class="btn btn-primary">Approved</button>`);
+                                $(`.${res.reqId}`).html('');
+                            }
+                            else {
+                                Swal.fire({
+                                    title: "Insufficient Balance!",
+                                    text: res.message,
+                                    icon: 'error',
+                                    allowOutsideClick: false,
+                                    allowEscapeKey: false,
+                                }
+                                );
+                            }
                         },
                         error: function (err) {
                             console.log(err.toString());
@@ -57,7 +68,6 @@ const withdrawRequestHandler = (function () {
             })
         });
     };
-
     rejectRequestEventHandler = function () {
         $(document).off('click', '.reject').on('click', '.reject', function () {
             swal.fire({
@@ -85,53 +95,25 @@ const withdrawRequestHandler = (function () {
             }).then((result) => {
                 if (result.isConfirmed) {
                     const data = {
-                        reqId: $(this).attr('id'),
-                        status: "rejected",
+                        amount: $(this).attr('data-amount'),
                         reason: result.value,
                         userId: $(this).attr('data-user-id')
                     }
                     $.ajax({
                         type: 'put',
-                        url: '/withdraw',
+                        url: `/withdraw/admin/request/${$(this).attr('id')}/${$(this).attr('data-status')}`,
                         data: data,
                         success: function (res) {
-                            const successHtml = $($.parseHTML(res)).filter("#withdraw-request-page").html();
-                            $("#withdraw-request-page").html(successHtml);
+                            $(`#${res.reqId}`).html(`<button type="button" class="btn btn-danger">Rejected</button>`);
+                            $(`.${res.reqId}`).html('');
                         },
                         error: function (err) {
-                            console.log(err.toString());
                         }
                     })
                 }
             })
         });
     };
-
-    paginationEventHandler = function () {
-        $(document).off('click', '.request-wise').on('click', '.request-wise', function () {
-            const page = $(this).data("page");
-            $.ajax({
-                type: "get",
-                //calling getUrl function with sort and sortOrder = '' and page parameter as page variable
-                url: getUrl('', '', page),
-                success: function (res) {
-                    const successHtml = $($.parseHTML(res)).filter("#withdraw-request-page").html();
-                    $("#withdraw-request-page").html(successHtml);
-                },
-                error: function (err) {
-                    console.log(err.toString());
-                }
-            });
-        });
-    };
-
-    clearEventHandler = function () {
-        $(document).off('click', '.clear-request').on('click', '.clear-request', function () {
-            window.location.replace("/withdraw/request");
-        });
-    };
-
-    //sorting on requests  based on admin selection
     sortRequestEventHandler = function () {
         $(document).off('click', '.sort-request').on('click', '.sort-request', function () {
             const sort = $(this).attr(`value`);
@@ -151,29 +133,6 @@ const withdrawRequestHandler = (function () {
             });
         });
     };
-
-    getUrl = function (sort, sortOrder, page) {
-        const url = new URL(location);
-        const startDate = $(".start-date-request").val();
-        const endDate = $(".end-date-request").val();
-        const filter = $('.filter-request').val();
-        //if user sorts the table contents than sorting field passed in query parameter
-        if (sort) url.searchParams.set("sort", `${sort}`);
-        //if user sorts the table contents than sorting field passed in query parameter with sortOrder parameter which
-        //sorts the records in order like ascending or descending
-        if (sortOrder) url.searchParams.set("sortOrder", `${sortOrder}`);
-
-        if (page) url.searchParams.set("page", `${page}`);
-        else {
-            url.searchParams.set("page", `1`);
-        }
-        url.searchParams.set("status", `${filter}`);
-        url.searchParams.set("from", `${startDate}`);
-        url.searchParams.set("to", `${endDate}`);
-        history.pushState({}, "", url);
-        return url;
-    };
-
     searchRequestEventHandler = function () {
         $(document).off('click', '.search-request').on('click', '.search-request', function () {
             $.ajax({
@@ -189,9 +148,63 @@ const withdrawRequestHandler = (function () {
             });
         });
     };
+    paginationEventHandler = function () {
+        $(document).off('click', '.request-wise').on('click', '.request-wise', function () {
+            const page = $(this).data("page");
+            $.ajax({
+                type: "get",
+                url: getUrl('', '', page),
+                success: function (res) {
+                    const successHtml = $($.parseHTML(res)).filter("#withdraw-request-page").html();
+                    $("#withdraw-request-page").html(successHtml);
+                },
+                error: function (err) {
+                    console.log(err.toString());
+                }
+            });
+        });
+    };
+    clearEventHandler = function () {
+        $(document).off('click', '.clear-request').on('click', '.clear-request', function () {
+            window.location.replace("/withdraw/admin/request");
+        });
+    };
+    getUrl = function (sort, sortOrder, page) {
+
+        const url = new URL(location);
+        const startDate = $(".start-date-request").val();
+        const endDate = $(".end-date-request").val();
+        const filter = $('.filter-request').val();
+        const user = $(".filter-user").val();
+
+        //if admin sorts the table contents than sorting field passed in query parameter
+        if (sort) url.searchParams.set("sort", `${sort}`);
+
+        //if admin sorts the table contents than sorting field passed in query parameter with sortOrder parameter which
+        //sorts the records in order like ascending or descending
+        if (sortOrder) url.searchParams.set("sortOrder", `${sortOrder}`);
+
+        //if admin moves to another page than page number is passed in query parameter
+        if (page) url.searchParams.set("page", `${page}`);
+
+        //otherwise pass page number = 1
+        else {
+            url.searchParams.set("page", `1`);
+        }
+
+        //if admin selects user to show specific that user's withdrawal request than userId passed in query parameter
+        url.searchParams.set("user", `${user}`);
+
+        //show withdraw request status wise by default shows only pending request
+        url.searchParams.set("status", `${filter}`);
+
+        //show withdrawal request only requested between last 7 days
+        url.searchParams.set("from", `${startDate}`);
+        url.searchParams.set("to", `${endDate}`);
+
+        history.pushState({}, "", url);
+        return url;
+    };
     const _this = this;
     this.initialize();
 })();
-
-
-

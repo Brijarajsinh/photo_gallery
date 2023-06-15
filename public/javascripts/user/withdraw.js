@@ -1,106 +1,28 @@
 const withdrawRequestHandler = (function () {
     this.initialize = function () {
 
+        //request coins for withdraw to admin
         withdrawCoinHandler();
 
+        //cancelRequestEventHandler cancels pending request
         cancelRequestEventHandler();
 
-        //sorting on gallery page of uploaded on and image cost with date and time
+        //sorting on withdraw request table
         sortRequestEventHandler();
 
-        //searching on gallery page by by cost
+        //searching on withdraw request table
         searchRequestEventHandler();
 
-        //pagination on uploaded images view
+        //pagination on withdraw request table
         paginationEventHandler();
 
-        //clear searching and filtering
+        //clear searching and filtering on withdraw request table
         clearEventHandler();
+
+        //user will view reason of rejected request by admin
+        viewDescriptionEventHandler();
     };
 
-    getUrl = function (sort, sortOrder, page) {
-        const url = new URL(location);
-        const startDate = $(".start-date").val();
-        const endDate = $(".end-date").val();
-        const filter = $('.filter-request-status').val();
-        //if user sorts the table contents than sorting field passed in query parameter
-        if (sort) url.searchParams.set("sort", `${sort}`);
-        //if user sorts the table contents than sorting field passed in query parameter with sortOrder parameter which
-        //sorts the records in order like ascending or descending
-        if (sortOrder) url.searchParams.set("sortOrder", `${sortOrder}`);
-
-        if (page) url.searchParams.set("page", `${page}`);
-        else {
-            url.searchParams.set("page", `1`);
-        }
-        url.searchParams.set("status", `${filter}`);
-        url.searchParams.set("from", `${startDate}`);
-        url.searchParams.set("to", `${endDate}`);
-        history.pushState({}, "", url);
-        return url;
-    };
-
-    cancelRequestEventHandler = function () {
-        $(document).off('click', ".cancel-request").on('click', ".cancel-request", function () {
-            Swal.fire({
-                title: 'Cancel',
-                text: "Are You Sure To Cancel This Withdrawal Request",
-                icon: 'question',
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Yes, Cancel it!',
-                allowOutsideClick: false,
-                allowEscapeKey: false,
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    const data = {
-                        reqId: $(this).attr('id'),
-                        status: "cancelled"
-                    }
-                    $.ajax({
-                        type: 'put',
-                        url: '/withdraw',
-                        data: data,
-                        async: true,
-                        success: function (res) {
-                            console.log(res);
-                            if (res.type == 'success') {
-                                $(`.${res.reqId}`).html(`<button type="button" class="btn btn-dark">Cancelled</button>`);
-                            }
-                            else {
-                                toastr.error(res.message);
-                            }
-                        },
-                        error: function (err) {
-                            console.log(err.toString());
-                        }
-                    })
-                }
-            })
-        });
-    }
-
-    //sorting on images  based on user selection
-    sortRequestEventHandler = function () {
-        $(document).off('click', '.sort-request').on('click', '.sort-request', function () {
-            const sort = $(this).attr(`value`);
-            const sortOrder = $(this).attr(`data-flag`);
-            $.ajax({
-                type: "get",
-                url: getUrl(sort, sortOrder),
-                success: function (res) {
-                    const successHtml = $($.parseHTML(res)).filter("#withdraw-list-page").html();
-                    $("#withdraw-list-page").html(successHtml);
-                    if (sortOrder == 'ASC') $(`#${sort}`).attr('data-flag', 'DSC');
-                    else $(`#${sort}`).attr('data-flag', 'ASC');
-                },
-                error: function (err) {
-                    console.log(err.toString());
-                }
-            });
-        });
-    };
     withdrawCoinHandler = function () {
         $(document).off('click', '.withdraw-coin').on('click', '.withdraw-coin', function () {
             $("#withdraw-request-form").validate({
@@ -117,7 +39,7 @@ const withdrawRequestHandler = (function () {
                     "withdraw": {
                         required: true,
                         min: 1,
-                        max: 100,
+                        max: 1000,
                         remote: '/my-account/get-coins'
                     }
                 },
@@ -159,6 +81,62 @@ const withdrawRequestHandler = (function () {
             });
         })
     }
+
+    cancelRequestEventHandler = function () {
+        $(document).off('click', ".cancel-request").on('click', ".cancel-request", function () {
+            Swal.fire({
+                title: 'Cancel',
+                text: "Are You Sure To Cancel This Withdrawal Request",
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, Cancel it!',
+                allowOutsideClick: false,
+                allowEscapeKey: false,
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        type: 'put',
+                        url: `/withdraw/request/${$(this).attr('id')}/cancel`,
+                        async: true,
+                        success: function (res) {
+                            if (res.type == 'success') {
+                                $(`.${res.reqId}`).html(`<button type="button" class="btn btn-dark">Cancelled</button>`);
+                            }
+                            else {
+                                toastr.error(res);
+                            }
+                        },
+                        error: function (err) {
+                            console.log(err.toString());
+                        }
+                    })
+                }
+            })
+        });
+    }
+
+    sortRequestEventHandler = function () {
+        $(document).off('click', '.sort-request').on('click', '.sort-request', function () {
+            const sort = $(this).attr(`value`);
+            const sortOrder = $(this).attr(`data-flag`);
+            $.ajax({
+                type: "get",
+                url: getUrl(sort, sortOrder),
+                success: function (res) {
+                    const successHtml = $($.parseHTML(res)).filter("#withdraw-list-page").html();
+                    $("#withdraw-list-page").html(successHtml);
+                    if (sortOrder == 'ASC') $(`#${sort}`).attr('data-flag', 'DSC');
+                    else $(`#${sort}`).attr('data-flag', 'ASC');
+                },
+                error: function (err) {
+                    console.log(err.toString());
+                }
+            });
+        });
+    };
+
     searchRequestEventHandler = function () {
         $(document).off('click', '.search-list').on('click', '.search-list', function () {
             $.ajax({
@@ -174,6 +152,7 @@ const withdrawRequestHandler = (function () {
             });
         });
     };
+
     paginationEventHandler = function () {
         $(document).off('click', '.request-wise').on('click', '.request-wise', function () {
             const page = $(this).data("page");
@@ -191,11 +170,54 @@ const withdrawRequestHandler = (function () {
             });
         });
     };
+
     clearEventHandler = function () {
         $(document).off('click', '.clear-list').on('click', '.clear-list', function () {
-            window.location.replace("/withdraw/list");
+            window.location.replace("/withdraw/request");
         });
     };
+
+    viewDescriptionEventHandler = function () {
+        $(document).off('click', ".view-status").on('click', ".view-status", function () {
+            $.ajax({
+                type: 'get',
+                url: `/withdraw/request/${$(this).attr('id')}/reason`,
+                async: true,
+                success: function (res) {
+                    const successHtml = $($.parseHTML(res)).filter("#withdraw-list-page").html();
+                    $("#withdraw-list-page").html(successHtml);
+                    $("#exampleModal1").modal('show');
+                },
+                error: function (err) {
+                    console.log(err.toString());
+                }
+            })
+        });
+    };
+
+    getUrl = function (sort, sortOrder, page) {
+        const url = new URL(location);
+        const startDate = $(".start-date").val();
+        const endDate = $(".end-date").val();
+        const filter = $('.filter-request-status').val();
+        //if user sorts the table contents than sorting field passed in query parameter
+        if (sort) url.searchParams.set("sort", `${sort}`);
+        //if user sorts the table contents than sorting field passed in query parameter with sortOrder parameter which
+        //sorts the records in order like ascending or descending
+        if (sortOrder) url.searchParams.set("sortOrder", `${sortOrder}`);
+
+        if (page) url.searchParams.set("page", `${page}`);
+        else {
+            url.searchParams.set("page", `1`);
+        }
+        url.searchParams.set("status", `${filter}`);
+        url.searchParams.set("from", `${startDate}`);
+        url.searchParams.set("to", `${endDate}`);
+        history.pushState({}, "", url);
+        return url;
+    };
+
+
     const _this = this;
     this.initialize();
 })();

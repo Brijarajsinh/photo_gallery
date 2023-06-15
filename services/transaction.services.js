@@ -20,7 +20,6 @@ exports.searchedDetails = async (search) => {
 
 //findObjTransaction function returns find object which is passed in find query of mongoose
 exports.findObjTransaction = async (userId, search) => {
-
     const find = {
         "userId": userId
     };
