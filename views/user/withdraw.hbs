@@ -141,8 +141,8 @@
                                                     {{#compare status '==' 'rejected'}}
                                                     <td class="{{_id}}">
                                                         <button type="button" class="btn btn-danger">Rejected</button>
-                                                        <button type="button" class="btn btn-info view-status"
-                                                            id="{{_id}}">Reason</button>
+                                                        <button title="{{description}}" type="button" class="btn btn-info view-status"
+                                                            data-reason="{{_id}}">Reason</button>
                                                     </td>
                                                     {{/compare}}
                                                     {{#compare status '==' 'approved'}}
@@ -185,7 +185,7 @@
     </nav>
 
     <!-- Modal -->
-    <div class="modal fade" id="exampleModal1" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+    <div class="modal fade" id="view-rejection-reason" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
         aria-hidden="true" data-backdrop="static" data-keyboard="false">
         <div class="modal-dialog" role="document">
             <div class="modal-content">

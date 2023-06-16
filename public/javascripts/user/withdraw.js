@@ -127,7 +127,7 @@ const withdrawRequestHandler = (function () {
                 success: function (res) {
                     const successHtml = $($.parseHTML(res)).filter("#withdraw-list-page").html();
                     $("#withdraw-list-page").html(successHtml);
-                    if (sortOrder == 'ASC') $(`#${sort}`).attr('data-flag', 'DSC');
+                    if (sortOrder == 'ASC') $(`#${sort}`).attr('data-flag', 'DESC');
                     else $(`#${sort}`).attr('data-flag', 'ASC');
                 },
                 error: function (err) {
@@ -184,6 +184,7 @@ const withdrawRequestHandler = (function () {
                 url: `/withdraw/request/${$(this).attr('id')}/reason`,
                 async: true,
                 success: function (res) {
+                    console.log(res);
                     const successHtml = $($.parseHTML(res)).filter("#withdraw-list-page").html();
                     $("#withdraw-list-page").html(successHtml);
                     $("#exampleModal1").modal('show');

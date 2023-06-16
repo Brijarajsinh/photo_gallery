@@ -14,7 +14,7 @@ const userListHandler = (function () {
     };
 
     //getUrl function creates url to call route with query parameters of search and page number
-    getUrl = function () {
+    getUrl = function (sort, sortOrder, page) {
         const url = new URL(location);
         const search = $(".search").val().trim();
         //if logged-in user search other user by first name, last name and full name
@@ -24,6 +24,20 @@ const userListHandler = (function () {
         }
         else {
             url.searchParams.set("search", ``);
+        }
+        //if admin sorts the table contents than sorting field passed in query parameter
+        if (sort) url.searchParams.set("sort", `${sort}`);
+
+        //if admin sorts the table contents than sorting field passed in query parameter with sortOrder parameter which
+        //sorts the records in order like ascending or descending
+        if (sortOrder) url.searchParams.set("sortOrder", `${sortOrder}`);
+
+        //if admin moves to another page than page number is passed in query parameter
+        if (page) url.searchParams.set("page", `${page}`);
+
+        //otherwise pass page number = 1
+        else {
+            url.searchParams.set("page", `1`);
         }
         const state = { page: 1 };
         history.pushState(state, "", url);
@@ -36,7 +50,6 @@ const userListHandler = (function () {
     //with that searched value as search parameter is applied in ajax request query string
     searchEventHandler = function () {
         $(document).off('click', '.search-user').on('click', '.search-user', function () {
-
             $.ajax({
                 type: "get",
                 url: getUrl(),
@@ -55,13 +68,10 @@ const userListHandler = (function () {
     //with that selected page value as page parameter in ajax request query string
     paginationEventHandler = function (pge) {
         $(document).off('click', '.user-wise').on('click', '.user-wise', function () {
-            let url = getUrl();
             const page = $(this).data('page');
-            url.searchParams.set("page", `${page}`);
-            history.pushState({}, "", url);
             $.ajax({
                 type: "get",
-                url: url,
+                url: getUrl('', '', page),
                 success: function (res) {
                     const successHtml = $($.parseHTML(res)).filter("#main").html();
                     $("#main").html(successHtml);
@@ -76,22 +86,17 @@ const userListHandler = (function () {
     //sorting user list based on admin selection
     sortingEventHandler = function () {
         $(document).off('click', '.sort').on('click', '.sort', function () {
-            let url = getUrl();
             const sort = $(this).attr(`value`);
             const sortOrder = $(this).attr(`data-flag`);
-            url.searchParams.set("sort", `${sort}`);
-            url.searchParams.set("sortOrder", `${sortOrder}`);
-            history.pushState({}, "", url);
 
             $.ajax({
                 type: "get",
-                url: url,
+                url: getUrl(sort, sortOrder),
                 success: function (res) {
-
                     const successHtml = $($.parseHTML(res)).filter("#main").html();
                     $("#main").html(successHtml);
 
-                    if (sortOrder == 'ASC') $(`#${sort}`).attr('data-flag', 'DSC');
+                    if (sortOrder == 'ASC') $(`#${sort}`).attr('data-flag', 'DESC');
                     else $(`#${sort}`).attr('data-flag', 'ASC');
                 },
                 error: function (err) {

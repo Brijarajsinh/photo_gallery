@@ -3,6 +3,7 @@ const userModel = require('../schema/userSchema');
 const path = require('path');
 const functionUsage = require('../helpers/function');
 const { updatedDetails } = require('../services/user.services');
+const { getCurrentPassword } = require('../services/user.services');
 //Fetches the current logged-in user's details from the users collection
 exports.getProfileDetails = async (req, res) => {
     try {
@@ -21,7 +22,7 @@ exports.getProfileDetails = async (req, res) => {
             currentDetails: currentDetails
         });
     } catch (error) {
-        console.log("Error Generated While Current-Logged in user views own profile");
+        console.log("Error Generated While Current-Logged in user views his own profile");
         console.log(error);
         res.send({
             type: 'error',
@@ -61,19 +62,15 @@ exports.editProfileDetails = async (req, res) => {
 //changes the password of logged-in user
 exports.changePassword = async (req, res) => {
     try {
+
         const newPassword = await functionUsage.generatePasswordHash(req.body.newPassword);
-        const currentPassword = await userModel.findOne({
-            "_id": req.user._id
-        }, {
-            "_id": 1,
-            "password": 1
-        });
+        const currentPassword = await getCurrentPassword(req.user._id);
         //if user enters wrong current password than throw error with message
-        if (currentPassword.password != await functionUsage.generatePasswordHash(req.body.currentPassword)) {
+        if (currentPassword != await functionUsage.generatePasswordHash(req.body.currentPassword)) {
             throw "Current Password Not Matched"
         }
         //if user try to set new password same as old password than throw error from here
-        else if (currentPassword.password == newPassword) {
+        else if (currentPassword == newPassword) {
             throw "You Can't set new password same to old password."
         }
         //else update the new password in users collection

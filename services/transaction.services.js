@@ -1,3 +1,4 @@
+const transactionModel = require('../schema/transactions');
 //searchedDetails function returns searched criteria
 exports.searchedDetails = async (search) => {
     const searchObj = {}
@@ -40,15 +41,14 @@ exports.findObjTransaction = async (userId, search) => {
     return find;
 };
 
-exports.sortObj = async (sort, sortOrder) => {
-    if (sort) {
-        //if user wants to sort transaction by field than add sort in mongoose query and sort results by that field
-        sortObj = { sort: sortOrder == 'ASC' ? 1 : -1 }
-        return sortObj
-    }
-    else {
-        //else sort all transactions by latest created
-        sortObj = { "_id": -1 }
-        return sortObj
-    }
-};
+//storeTransaction function stores transaction entry in transaction model
+exports.storeTransaction = async (userId, status, amount, type, description) => {
+    const transaction = new transactionModel({
+        'userId': userId,
+        'status': status,
+        'amount': amount,
+        'type': type,
+        'description': description
+    });
+    await transaction.save();
+}

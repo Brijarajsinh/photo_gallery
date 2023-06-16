@@ -1,65 +1,19 @@
 const withdrawModel = require('../schema/withdraw');
 const UserModel = require('../schema/userSchema');
-const transactionModel = require('../schema/transactions');
 const commonFunction = require('../helpers/function');
-const mongoose = require("mongoose");
+const withdrawService = require('../services/withdrawal.services');
 
+//getWithdrawRequestAdminSide function fetches all withdrawal request of all user and display requests user side
+//on selection of user and filter by status fetches that selected filter's withdrawal requests
 exports.getWithdrawRequestAdminSide = async (req, res) => {
     try {
-        const find = {
-            'status': {
-                $ne: 'cancelled'
-            }
-        }
-        const search = {}
-        const sort = {}
+        const find = await withdrawService.prepareFindObj(req.user.role, req.query.from, req.query.to, req.query.status, req.query.user);
+        const search = await withdrawService.prepareSearchObj(req.user.role, req.query.from, req.query.to, req.query.status, req.query.user);
+        const sort = await commonFunction.prepareSortObj(req.query.sort, req.query.sortOrder);
         const pageSkip = (Number(req.query.page)) ? Number(req.query.page) : 1;
         const limit = 4;
         const skip = (pageSkip - 1) * limit;
 
-        //sorting
-        if (req.query.sort) {
-            sort[`${req.query.sort}`] = req.query.sortOrder == 'ASC' ? 1 : -1
-        }
-        else {
-            sort['_id'] = -1;
-        }
-
-        //filtering date wise
-        if (req.query.from && req.query.to) {
-            const start = new Date(req.query.from);
-            const end = new Date(req.query.to);
-            find.createdOn = {
-                $gte: start,
-                $lt: end
-            }
-            search['from'] = req.query.from;
-            search['to'] = req.query.to;
-        }
-
-        //filtering on status
-        if (req.query.status) {
-            find['status'] = req.query.status
-            search['filterType'] = req.query.status
-        }
-        else if (req.query.status == '') {
-            search['filterType'] = 'all'
-        }
-        else {
-            find['status'] = 'pending'
-            search['filterType'] = 'pending'
-        }
-
-        //filter by user
-        if (req.query.user) {
-            find.userId = {
-                $eq: new mongoose.Types.ObjectId(req.query.user)
-            }
-            search['filterUser'] = req.query.user
-        }
-        else {
-            search['filterUser'] = 'all'
-        }
         const users = await UserModel.find({ "role": 'user' }, { "_id": 1, "fullName": 1 }).lean();
         const withdrawRequest = await withdrawModel.aggregate([
             {
@@ -121,48 +75,77 @@ exports.getWithdrawRequestAdminSide = async (req, res) => {
     }
 };
 
+//updateWithdrawRequest function update the withdrawal request's status from pending to approve according to action performed by admin
+exports.updateWithdrawRequest = async (req, res) => {
+    try {
+        const reqId = req.params.reqId;
+        const status = req.params.status;
+        const userId = req.body.userId;
+        const amount = req.body.amount;
+        const requestDetails = {
+            'status': status,
+        }
+        //Admin perform reject action on pending withdrawal request
+        if (req.body.reason) {
+            requestDetails['description'] = req.body.reason
+            //using socket.io send notification to the user that admin uploads withdraw request status to rejected from pending
+            io.to('userRoom').emit('requestUpdate', {
+                'userId': userId,
+                'message': `Admin has Rejected Your Withdraw Request of ${amount}`
+            });
+        }
+        //Admin perform reject action on pending withdrawal request
+        else {
+            const availableCoins = await commonFunction.getAvailableCoins(userId);
+            //if requested amount is greater than available balance than throw an error with message
+            if (amount > availableCoins) {
+                //using socket.io send notification to the user that admin uploads withdraw request status to approved from pending
+                io.to('userRoom').emit('requestUpdate', {
+                    'userId': userId,
+                    'message': `Admin can't Approve Your Withdraw Request,${amount} coin not available in your wallet.`
+                });
+                throw "Insufficient Balance to Withdraw"
+            }
+            else {
+                //else deduct requested coins from user's wallet and store hte entry in transaction collection
+                await withdrawService.deductWithdrawAmount(userId, amount);
+            }
+        }
+        await withdrawModel.updateOne({
+            "_id": reqId
+        }, requestDetails);
+
+        res.send({
+            type: 'success',
+            reqId: reqId
+        });
+    } catch (error) {
+        console.log("Error generated while updating status of withdraw request");
+        console.log(error);
+        res.send({
+            type: 'error',
+            message: error
+        });
+    }
+};
+
+//getWithdrawRequestUserSide function get all withdrawal request of current logged-in user
 exports.getWithdrawRequestUserSide = async (req, res) => {
     try {
-        const userId = req.user._id;
-        const find = {
-            "userId": userId
-        }
-        const search = {}
-        const sort = {}
-
-        if (req.query.sort) {
-            sort[`${req.query.sort}`] = req.query.sortOrder == 'ASC' ? 1 : -1
-        }
-        else {
-            sort['_id'] = -1;
-        }
-        if (req.query.from && req.query.to) {
-            const start = new Date(req.query.from);
-            const end = new Date(req.query.to);
-            find.createdOn = {
-                $gte: start,
-                $lt: end
-            }
-            search['from'] = req.query.from;
-            search['to'] = req.query.to;
-        }
-
-        if (req.query.status) {
-            find['status'] = req.query.status
-            search['filterType'] = req.query.status
-        }
-        else if (req.query.status == '') {
-            search['filterType'] = 'all'
-        }
+        const find = await withdrawService.prepareFindObj(req.user.role, req.query.from, req.query.to, req.query.status, req.user._id);
+        const search = await withdrawService.prepareSearchObj(req.user.role, req.query.from, req.query.to, req.query.status);
+        const sort = await commonFunction.prepareSortObj(req.query.sort, req.query.sortOrder);
         const pageSkip = (Number(req.query.page)) ? Number(req.query.page) : 1;
         const limit = 2;
         const skip = (pageSkip - 1) * limit;
+
         const withdrawRequest = await withdrawModel.find(find, {
             "_id": 1,
             "userId": 1,
             "createdOn": 1,
             "amount": 1,
             "status": 1,
+            "description":1
         }).sort(sort).skip(skip).limit(limit).lean();
         const totalRequests = await withdrawModel.countDocuments(find);
         const pageCount = Math.ceil(totalRequests / limit);
@@ -171,13 +154,13 @@ exports.getWithdrawRequestUserSide = async (req, res) => {
             title: 'Withdraw',
             requests: withdrawRequest,
             page: page,
-            currentPage: pageSkip,
-            search: search
+            currentPage: pageSkip
         }
         if (req.xhr) {
             response['layout'] = 'blank';
             response['search'] = search;
         }
+
         res.render('user/withdraw', response);
     } catch (error) {
         console.log("Error Generated In rendering Withdraw Page");
@@ -189,6 +172,7 @@ exports.getWithdrawRequestUserSide = async (req, res) => {
     }
 };
 
+//stores withdrawal request with status pending in withdraw collection with amount and requestedBy
 exports.withdrawCoinRequest = async (req, res) => {
     try {
         const withdrawRecord = new withdrawModel({
@@ -214,6 +198,8 @@ exports.withdrawCoinRequest = async (req, res) => {
     }
 };
 
+//user wants to cancel pending request that cancelWithdrawRequest function is called
+//and update that request status from pending to cancelled
 exports.cancelWithdrawRequest = async (req, res) => {
     try {
         const reqId = req.params.reqId;
@@ -236,76 +222,7 @@ exports.cancelWithdrawRequest = async (req, res) => {
     }
 };
 
-exports.updateWithdrawRequest = async (req, res) => {
-    try {
-        const reqId = req.params.reqId;
-        const status = req.params.status;
-        const userId = req.body.userId;
-        const amount = req.body.amount;
-        const requestDetails = {
-            'status': status,
-        }
-        if (req.body.reason) {
-            requestDetails['description'] = req.body.reason
-            //using socket.io send notification to the user that admin uploads withdraw request status to rejected from pending
-            io.to('userRoom').emit('requestUpdate', {
-                'userId': userId,
-                'message': `Admin has Rejected Your Withdraw Request of ${amount}`
-            });
-        }
-        else {
-            const availableCoins = await commonFunction.getAvailableCoins(userId);
-            //if requested amount is greater than available balance than throw an error with message
-            if (amount > availableCoins) {
-                //using socket.io send notification to the user that admin uploads withdraw request status to approved from pending
-                io.to('userRoom').emit('requestUpdate', {
-                    'userId': userId,
-                    'message': `Admin can't Approve Your Withdraw Request,${amount} coin not available in your wallet.`
-                });
-                throw "Insufficient Balance to Withdraw"
-            }
-            //else deduct requested coins from user's wallet
-            else {
-                await UserModel.updateOne({
-                    "_id": userId
-                }, {
-                    $inc: {
-                        'availableCoins': -amount
-                    }
-                });
-                //Store Entry In Transaction Model for withdrawal coin
-                const transaction = await new transactionModel({
-                    'userId': userId,
-                    'status': 'debit',
-                    'amount': amount,
-                    'type': `withdrawal`,
-                    'description': `${amount} coins are withdraw`
-                });
-                await transaction.save();
-                //using socket.io send notification to the user that admin uploads withdraw request status to approved from pending
-                io.to('userRoom').emit('requestUpdate', {
-                    'userId': userId,
-                    'message': `Admin has Approved Your Withdraw Request of ${amount} coin`
-                });
-            }
-        }
-        await withdrawModel.updateOne({
-            "_id": reqId
-        }, requestDetails);
-        res.send({
-            type: 'success',
-            reqId: reqId
-        });
-    } catch (error) {
-        console.log("Error generated while updating status of withdraw request");
-        console.log(error);
-        res.send({
-            type: 'error',
-            message: error
-        });
-    }
-};
-
+//getRejectionReason function returns the description for rejecting withdrawal request and show reason to user
 exports.getRejectionReason = async (req, res) => {
     try {
         const reason = await withdrawModel.findOne({
@@ -314,7 +231,7 @@ exports.getRejectionReason = async (req, res) => {
             '_id': 1,
             'description': 1
         });
-        res.render('user/withdraw',{
+        res.render('user/withdraw', {
             reason: reason.description
         });
     } catch (error) {

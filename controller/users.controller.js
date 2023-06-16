@@ -34,7 +34,6 @@ exports.registration = async (req, res, next) => {
                 //set the local variable 'user' to access details of current logged in user
                 console.log("Log IN Successfully");
                 res.locals.user = req.user;
-
                 //if user register with referral code than 
                 if (userDetails.referral) {
                     const referral = await userModel.findOne({ "referLink": userDetails.referral }, { "_id": 1, "referralUsers": 1 });
@@ -43,12 +42,6 @@ exports.registration = async (req, res, next) => {
                         //if user entered referral code is valid and limit of referring user is applicable
                         // than that referred user will get extra referral bonus via referBonus service
                         await userServices.applyReferBonus(referral._id);
-
-                        //using socket.io send notification to the user that another user register with his referral link
-                        io.to("userRoom").emit('registerWithReferLink', {
-                            'userName': `${user.fname} ${user.lname}`,
-                            'referredBy': `${referral._id}`
-                        });
                     }
                 }
                 res.send({
@@ -127,19 +120,6 @@ exports.checkEmail = async (req, res) => {
     return res.send(true);
 }
 
-//this function checks role of logged in user and according to role allow functionalities
-exports.redirectToDashboard = async (req, res) => {
-    if (req.user.role == 'admin') {
-        res.render('admin', {
-            title: 'Dashboard'
-        });
-    }
-    else {
-        res.render('user', {
-            title: 'Dashboard'
-        });
-    }
-};
 
 //getTransactions function gets all transactions of logged-in user
 exports.getTransactions = async (req, res, next) => {
@@ -152,7 +132,7 @@ exports.getTransactions = async (req, res, next) => {
         const skip = (pageSkip - 1) * limit;
         const find = await transactionServices.findObjTransaction(req.user._id, req.query);
         const search = await transactionServices.searchedDetails(req.query);
-        const sort = await transactionServices.sortObj(req.query.sort, req.query.sortOrder);
+        const sort = await functionUsage.prepareSortObj(req.query.sort, req.query.sortOrder);
 
         const transactions = await transactionModel.find(
             find

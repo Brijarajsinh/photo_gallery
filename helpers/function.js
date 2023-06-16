@@ -6,9 +6,21 @@ const md = forge.md.sha512.sha256.create();
 //requiring model to work with collection of that models
 const userModel = require('../schema/userSchema');
 const settingModel = require('../schema/generalSettings');
-const transactionModel = require('../schema/transactions');
 
 module.exports = {
+    //this function checks role of logged in user and according to role redirect to dashboard page
+    redirectToDashboard: async function (req, res) {
+        if (req.user.role == 'admin') {
+            res.render('admin', {
+                title: 'Dashboard'
+            });
+        }
+        else {
+            res.render('user', {
+                title: 'Dashboard'
+            });
+        }
+    },
 
     //referralBonus function returns referral bonus fetched from settings collection
     _getReferralBonus: async function () {
@@ -21,63 +33,7 @@ module.exports = {
         return forge.md.sha512.sha256.create().update(password).digest().toHex();
     },
 
-    //returns the current applied general-setting
-    getSettings:async function(){
-       return await settingModel.findOne({}, {
-            "_id": 0,
-            "chargePerImage": 1,
-            "maxRefer": 1,
-            "referralBonus": 1,
-            "welcomeBonus": 1
-        }).lean();
-    },
-    
-    //applySettings function returns updated settings value's object with key
-    applySettings: function (req) {
-        if (req) {
-            //if admin wants to apply general setting than passed parameters are applied and
-            //returns an object which consists update value of general settings
-            const settings = req;
-            return settings;
-        }
-        else {
 
-            //Otherwise set a general settings value from the env variable
-            const settings = {
-                welcomeBonus: process.env.welcomeBonus,
-                referralBonus: process.env.referralBonus,
-                chargePerImage: process.env.chargePerImage,
-                maxRefer: process.env.maxRefer
-            }
-            return settings;
-        }
-    },
-
-    //applyReferBonus function applies referral bonus to the applicable user
-    applyReferBonus: async function (user) {
-        const _this = this;
-        const referralBonus = await this._getReferralBonus()
-        await userModel.updateOne({
-            "_id": user
-        },
-            {
-                $inc: {
-                    "availableCoins": referralBonus,
-                    "referralUsers": 1
-                }
-
-            });
-
-        //Store Entry In Transaction Model To Track User's Wallet Transactions
-        const transaction = await new transactionModel({
-            'userId': user,
-            'status': 'credit',
-            'amount': referralBonus,
-            'type': `referral-bonus`,
-            'description':`${referralBonus} coins are credited for referring user`
-        });
-        await transaction.save();
-    },
     //generateReferLink function generates unique referral code for referring to other user
     generateReferLink: async function (length) {
         const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
@@ -141,11 +97,18 @@ module.exports = {
     },
 
     //returns the pagination array 
-    createPagination:async function(pages){
+    createPagination: async function (pages) {
         const page = [];
         for (let i = 1; i <= pages; i++) {
             page.push(i);
         }
         return page;
+    },
+
+    prepareSortObj: function (sort, sortBy) {
+        const sortObj = {};
+        if (sort) sortObj[sort] = sortBy == 'ASC' ? 1 : -1
+        else sortObj._id = -1
+        return sortObj;
     }
 }

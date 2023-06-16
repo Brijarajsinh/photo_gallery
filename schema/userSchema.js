@@ -1,9 +1,8 @@
 //requiring mongoose  
 const { default: mongoose } = require("mongoose");
 
-//requiring transaction model to enter a transaction record of welcome bonus
-const transactionModel = require('../schema/transactions');
-
+//requiring storeTransaction function which provide service to store in transaction in transaction schema
+const { storeTransaction } = require('../services/transaction.services');
 
 //creating option object for timestamp fields in collection
 const option = {
@@ -76,14 +75,8 @@ userSchema.pre('save', async function (next) {
     if (`${this.role}` == 'user') {
         //if registered user's role is 'use' 
         //then entry transaction of welcome bonus in transaction collection
-        const transaction = await new transactionModel({
-            'userId': `${this._id}`,
-            'status': 'credit',
-            'amount': `${this.availableCoins}`,
-            'type': `welcome-bonus`,
-            'description': `${this.availableCoins} coins are credited for registering in application`
-        });
-        await transaction.save();
+        const description = `${this.availableCoins} coins are credited for registering in application`
+        await storeTransaction(`${this._id}`,'credit',`${this.availableCoins}`,`welcome-bonus`,description);
     }
     next();
 });

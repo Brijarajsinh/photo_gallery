@@ -124,8 +124,8 @@ const withdrawRequestHandler = (function () {
                 success: function (res) {
                     const successHtml = $($.parseHTML(res)).filter("#withdraw-request-page").html();
                     $("#withdraw-request-page").html(successHtml);
-                    if (sortOrder == 'ASC') $(`#${sort}`).attr('data-flag', 'DSC');
-                    else $(`#${sort}`).attr('data-flag', 'ASC');
+                    if (sortOrder == 'ASC') $(`#sort-${sort}`).attr('data-flag', 'DESC');
+                    else $(`#sort-${sort}`).attr('data-flag', 'ASC');
                 },
                 error: function (err) {
                     console.log(err.toString());

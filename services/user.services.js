@@ -1,8 +1,29 @@
 const functionUsage = require('../helpers/function');
+const UserModel = require('../schema/userSchema');
+const { storeTransaction } = require('./transaction.services');
 
-//referralBonus function provides service to add referral bonus to referred by user
+//applyReferBonus function applies referral bonus to the applicable user
 exports.applyReferBonus = async (user) => {
-    await functionUsage.applyReferBonus(user);
+    const _this = this;
+    const referralBonus = await functionUsage._getReferralBonus()
+    await UserModel.updateOne({
+        "_id": user
+    },
+        {
+            $inc: {
+                "availableCoins": referralBonus,
+                "referralUsers": 1
+            }
+        });
+    //Store Entry In Transaction Model To Track User's Wallet Transactions
+    const description = `${referralBonus} coins are credited for referring user`
+    await storeTransaction(user, 'credit', referralBonus, 'referral-bonus', description);
+
+    //using socket.io send notification to the user that another user register with his referral link
+    io.to("userRoom").emit('registerWithReferLink', {
+        'userName': `${user.fname} ${user.lname}`,
+        'referredBy': `${user}`
+    });
 };
 
 //this function creates and returns user object to store in user's collection
@@ -35,7 +56,7 @@ exports.updatedDetails = async (user) => {
 };
 
 //this function creates and returns an array of image to be uploaded
-exports.createImgArray = async (imageCount,userId,images,cost) => {
+exports.createImgArray = async (imageCount, userId, images, cost) => {
     const uploadImages = [];
     for (let i = 0; i < imageCount; i++) {
         const imageDetails = {
@@ -50,3 +71,15 @@ exports.createImgArray = async (imageCount,userId,images,cost) => {
     return uploadImages;
 };
 
+//getCurrentPassword function fetches the current password of logged-in user from users collection
+exports.getCurrentPassword = async (userId) => {
+    const currentPassword = await UserModel.findOne(
+        {
+            "_id": userId
+        },
+        {
+            "_id": 0,
+            "password": 1
+        });
+    return currentPassword.password;
+};

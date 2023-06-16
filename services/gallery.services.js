@@ -1,13 +1,17 @@
+
+const userModel = require('../schema/userSchema');
+const { storeTransaction } = require('./transaction.services');
+
 //searchedDetails function returns searched criteria
 exports.searchedDetails = async (search) => {
     const searchObj = {}
     if (search.from && search.to) {
-        search['from'] = search.from;
-        search['to'] = search.to;
+        searchObj['from'] = search.from;
+        searchObj['to'] = search.to;
     }
     if (search.charge) {
         //if user wants to search transaction by charge than searching is applied while fetching transactions records
-        search['searchCost'] = search.charge;
+        searchObj['searchCost'] = search.charge;
     }
     return searchObj;
 };
@@ -33,13 +37,24 @@ exports.findObjImages = async (userId, search) => {
     return find;
 };
 
-exports.sortObj = async (sort, sortOrder) => {
-    const sortObj = {};
-    if (sort) {
-        sortObj[sort] = sortOrder == 'ASC' ? 1 : -1
-    }
-    else {
-        sortObj._id = -1;
-    }
-    return sortObj;
+//deductUploadImageCharge service deduct image charge from user wallet and entry in transaction collection
+exports.deductUploadImageCharge = async (userId, charge, name, imageCount, uploadCharge) => {
+    await userModel.updateOne({
+        "_id": userId
+    },
+        {
+            $inc: {
+                'availableCoins': -charge
+            }
+        });
+
+    const description = `${charge} coins debited for uploading ${imageCount} image (Charge per Image Uploading - ${uploadCharge}) coins`
+    //Store Entry In Transaction Model of charge deduction of image uploading
+    await storeTransaction(userId,'debit',charge,'image-deduction',description);
+
+
+    //using socket.io send notification to the admin that user uploaded an image
+    io.to('adminRoom').emit('imageUpload', {
+        'userName': name
+    });
 };

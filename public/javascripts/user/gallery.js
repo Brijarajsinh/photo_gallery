@@ -59,7 +59,7 @@ const galleryHandler = (function () {
                     const successHtml = $($.parseHTML(res)).filter("#images-page").html();
                     $("#images-page").html(successHtml);
 
-                    if (sortOrder == 'ASC') $(`#${sort}`).attr('data-flag', 'DSC');
+                    if (sortOrder == 'ASC') $(`#${sort}`).attr('data-flag', 'DESC');
                     else $(`#${sort}`).attr('data-flag', 'ASC');
                 },
                 error: function (err) {
