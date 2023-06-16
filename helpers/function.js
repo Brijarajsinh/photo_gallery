@@ -33,7 +33,6 @@ module.exports = {
         return forge.md.sha512.sha256.create().update(password).digest().toHex();
     },
 
-
     //generateReferLink function generates unique referral code for referring to other user
     generateReferLink: async function (length) {
         const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
@@ -79,7 +78,6 @@ module.exports = {
         return imageUploadCharge.chargePerImage;
     },
 
-
     //check admin function allows only admins to access functionality of admin role
     checkAdmin: async function (req, res, next) {
         if (req.user.role == 'admin') {
@@ -110,5 +108,45 @@ module.exports = {
         if (sort) sortObj[sort] = sortBy == 'ASC' ? 1 : -1
         else sortObj._id = -1
         return sortObj;
+    },
+
+    //sendMail function sends mail to user for informing action performed by admin
+    mailContent: async function (receiverObj, status) {
+        const receiver = receiverObj.requestedBy.email;
+        console.log("RECEIVER");
+        console.log(receiver);
+        from = 'mahidabrijrajsinh2910@gmail.com', // sender address
+            to = `${receiver}`, // list of receivers
+            subject = 'Withdrawal Request Status Updates', // Subject line
+            text = `Withdrawal request is ${status}.`,
+            html = await this._getMailMessage(receiverObj, status)
+        return {
+            //returns from,to,subject,text and html  value to the calling variable or function
+            from,
+            to,
+            subject,
+            text,
+            html
+        }
+    },
+
+    _getMailMessage: function (sendMailObj, status) {
+        if (status == 'approved') {
+            console.log("111111111");
+            return `<h1>Congratulations ${sendMailObj.requestedBy.fullName},<h1><br>
+            <h3>Your Withdrawal Request of ${sendMailObj.amount} coin is approved by admin of Photo Gallery Affiliate Marketing
+            on ${sendMailObj.updatedOn}.
+            </h3><br>
+            <h4>Your Available Coins in Wallet is ${sendMailObj.requestedBy.availableCoins}.</h4>`
+        }
+        else {
+            console.log("22222222");
+            return `<h1>Sorry ${sendMailObj.requestedBy.fullName},<h1><br>
+            <h3>Your Withdrawal Request of ${sendMailObj.amount} coin is rejected by admin of Photo Gallery Affiliate Marketing
+            on ${sendMailObj.updatedOn}.
+            </h3><br>
+            <h4>Reason for Rejection of Withdrawal Request ${sendMailObj.description}.</h4>`
+        }
     }
 }
+

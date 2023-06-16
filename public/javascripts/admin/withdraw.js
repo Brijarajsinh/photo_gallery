@@ -85,6 +85,7 @@ const withdrawRequestHandler = (function () {
                 },
                 allowOutsideClick: false,
                 allowEscapeKey: false,
+                // showLoaderOnConfirm: true
                 preConfirm: (value) => {
                     if (!value) {
                         Swal.showValidationMessage(

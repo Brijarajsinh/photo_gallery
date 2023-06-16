@@ -2,6 +2,8 @@ const withdrawModel = require('../schema/withdraw');
 const UserModel = require('../schema/userSchema');
 const commonFunction = require('../helpers/function');
 const withdrawService = require('../services/withdrawal.services');
+const mailer = require('../mailer');
+const { default: mongoose } = require('mongoose');
 
 //getWithdrawRequestAdminSide function fetches all withdrawal request of all user and display requests user side
 //on selection of user and filter by status fetches that selected filter's withdrawal requests
@@ -75,7 +77,7 @@ exports.getWithdrawRequestAdminSide = async (req, res) => {
     }
 };
 
-//updateWithdrawRequest function update the withdrawal request's status from pending to approve according to action performed by admin
+//updateWithdrawRequest function update the withdrawal request's status from pending to approved or rejected according to action performed by admin
 exports.updateWithdrawRequest = async (req, res) => {
     try {
         const reqId = req.params.reqId;
@@ -108,12 +110,53 @@ exports.updateWithdrawRequest = async (req, res) => {
             }
             else {
                 //else deduct requested coins from user's wallet and store hte entry in transaction collection
-                await withdrawService.deductWithdrawAmount(userId, amount);
+                //    await withdrawService.deductWithdrawAmount(userId, amount);
             }
         }
-        await withdrawModel.updateOne({
-            "_id": reqId
-        }, requestDetails);
+        // await withdrawModel.updateOne({
+        //     "_id": reqId
+        // }, requestDetails);
+
+
+        const sendMailTo = await withdrawModel.aggregate([
+            {
+                $match: {
+                    "_id": new mongoose.Types.ObjectId(reqId)
+                }
+            },
+            {
+                $lookup: {
+                    from: "users",
+                    let: { userId: "$userId" },
+                    pipeline: [
+                        {
+                            $match: {
+                                $expr: {
+                                    $eq: ["$_id", "$$userId"]
+                                }
+                            }
+                        },
+                        {
+                            $project: { _id: 0, email: 1, fullName: 1, availableCoins: 1 }
+                        }
+                    ],
+                    as: "requestedBy"
+                }
+            },
+            {
+                $project: {
+                    "_id": 0,
+                    "createdOn": 1,
+                    "updatedOn": 1,
+                    "description": 1,
+                    "amount": 1,
+                    "requestedBy": { $arrayElemAt: ["$requestedBy", 0] }
+                }
+            }
+        ]);
+        console.log(sendMailTo[0]);
+        const info = await mailer.sendMail(await commonFunction.mailContent(sendMailTo[0], status));
+        console.log(`Message Sent SuccessFully`);
 
         res.send({
             type: 'success',
@@ -145,7 +188,7 @@ exports.getWithdrawRequestUserSide = async (req, res) => {
             "createdOn": 1,
             "amount": 1,
             "status": 1,
-            "description":1
+            "description": 1
         }).sort(sort).skip(skip).limit(limit).lean();
         const totalRequests = await withdrawModel.countDocuments(find);
         const pageCount = Math.ceil(totalRequests / limit);

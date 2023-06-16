@@ -70,7 +70,6 @@ module.exports = {
         });
         passport.deserializeUser(async function (req, user, done) {
             try {
-
                 const currentUser = await userModel.findOne({ "_id": user._id }, {
                     _id: 1,
                     role: 1,
