@@ -110,7 +110,7 @@ const userListHandler = (function () {
     //than this function requests an ajax call and clear the search query parameter to fetch all records
     clearEventHandler = function () {
         $(document).off('click', '.clear-search').on('click', '.clear-search', function () {
-            window.location.replace("/user-list");
+            window.location.replace("/user/list");
         });
     }
 

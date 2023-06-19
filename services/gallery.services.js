@@ -2,8 +2,8 @@
 const userModel = require('../schema/userSchema');
 const { storeTransaction } = require('./transaction.services');
 
-//searchedDetails function returns searched criteria
-exports.searchedDetails = async (search) => {
+//prepareSearchObject function returns searched criteria
+exports.prepareSearchObject = async (search) => {
     const searchObj = {}
     if (search.from && search.to) {
         searchObj['from'] = search.from;
@@ -17,8 +17,7 @@ exports.searchedDetails = async (search) => {
 };
 
 //findObjImages function returns find object which is passed in find query of mongoose
-exports.findObjImages = async (userId, search) => {
-
+exports.prepareFindObjImages = async (userId, search) => {
     const find = {
         "userId": userId
     };

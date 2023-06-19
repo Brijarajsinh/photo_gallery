@@ -2,7 +2,7 @@
 const userModel = require('../schema/userSchema');
 const transactionModel = require('../schema/transactions');
 
-const functionUsage = require('../helpers/function');
+const commonFunction = require('../helpers/function');
 const passport = require('passport');
 const userServices = require('../services/user.services');
 const transactionServices = require('../services/transaction.services');
@@ -38,7 +38,7 @@ exports.registration = async (req, res, next) => {
                 if (userDetails.referral) {
                     const referral = await userModel.findOne({ "referLink": userDetails.referral }, { "_id": 1, "referralUsers": 1 });
                     //checks if applied referral code is valid and limit of referring user is applicable
-                    if (referral.referralUsers <= await functionUsage.getReferralCount()) {
+                    if (referral.referralUsers <= await commonFunction.getReferralCount()) {
                         //if user entered referral code is valid and limit of referring user is applicable
                         // than that referred user will get extra referral bonus via referBonus service
                         await userServices.applyReferBonus(referral._id);
@@ -131,8 +131,8 @@ exports.getTransactions = async (req, res, next) => {
         const limit = 3;
         const skip = (pageSkip - 1) * limit;
         const find = await transactionServices.findObjTransaction(req.user._id, req.query);
-        const search = await transactionServices.searchedDetails(req.query);
-        const sort = await functionUsage.prepareSortObj(req.query.sort, req.query.sortOrder);
+        const search = await transactionServices.prepareSearchObj(req.query);
+        const sort = await commonFunction.prepareSortObj(req.query.sort, req.query.sortOrder);
 
         const transactions = await transactionModel.find(
             find
@@ -149,7 +149,7 @@ exports.getTransactions = async (req, res, next) => {
         );
         //generates pages by dividing total users displayed in one page
         const pageCount = Math.ceil(totalEntry / limit);
-        const page = await functionUsage.createPagination(pageCount);
+        const page = await commonFunction.createPagination(pageCount);
         
         const response = {
             title: 'Transactions',

@@ -13,7 +13,6 @@ const indexRouter = require('./routes/index');
 const userRouter = require('./routes/users');
 const dashboardRouter = require('./routes/dashboard');
 const settingRouter = require('./routes/settings');
-const userListRouter = require('./routes/userList');
 const galleryRouter = require('./routes/gallery');
 const transactionRouter = require('./routes/transaction');
 const profileRouter = require('./routes/profile');
@@ -37,14 +36,8 @@ const hbs = exHbs.create({
   defaultLayout: 'main',
   helpers: {
     ...helpers,
-    dateConvert: function (date1) {
+    formatDate: function (date1) {
       return moment(date1).format('DD/MM/YYYY, h:mm a');
-    },
-    endDate: function () {
-      return moment(Date.now()).format('yy-MM-DDTHH:mm');
-    },
-    startDate: function () {
-      return moment(Date.now()).subtract(6, 'd').format('yy-MM-DDTHH:mm');
     }
   }
 });
@@ -93,13 +86,12 @@ app.use('/', indexRouter);
 app.use('/user', userRouter);
 
 //common middleware that restricts to access next all pages and routes without login
-app.use(auth.commonMiddleware);
+app.use(auth.isAuth);
 
 
 //this page are only accessible after login
 app.use('/dashboard', dashboardRouter);
 app.use('/settings', settingRouter);
-app.use('/user-list', userListRouter);
 app.use('/gallery', galleryRouter);
 app.use('/transaction', transactionRouter);
 app.use('/my-account',profileRouter);

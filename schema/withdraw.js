@@ -29,6 +29,9 @@ const withdrawSchema = new mongoose.Schema({
     },
     description: {
         type: String
+    },
+    actionPerformedAt:{
+        type:Date
     }
 }, option);
 

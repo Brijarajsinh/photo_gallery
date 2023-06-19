@@ -1,7 +1,7 @@
 //requiring mongoose model and other variables to work with collection of that models
 const userModel = require('../schema/userSchema');
 const path = require('path');
-const functionUsage = require('../helpers/function');
+const commonFunction = require('../helpers/function');
 const { updatedDetails } = require('../services/user.services');
 const { getCurrentPassword } = require('../services/user.services');
 //Fetches the current logged-in user's details from the users collection
@@ -63,10 +63,10 @@ exports.editProfileDetails = async (req, res) => {
 exports.changePassword = async (req, res) => {
     try {
 
-        const newPassword = await functionUsage.generatePasswordHash(req.body.newPassword);
+        const newPassword = await commonFunction.generatePasswordHash(req.body.newPassword);
         const currentPassword = await getCurrentPassword(req.user._id);
         //if user enters wrong current password than throw error with message
-        if (currentPassword != await functionUsage.generatePasswordHash(req.body.currentPassword)) {
+        if (currentPassword != await commonFunction.generatePasswordHash(req.body.currentPassword)) {
             throw "Current Password Not Matched"
         }
         //if user try to set new password same as old password than throw error from here

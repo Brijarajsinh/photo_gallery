@@ -1,12 +1,10 @@
 //requiring necessary packages
 const express = require('express');
 const router = express.Router();
-const userController = require('../controller/users.controller');
+const { checkAdmin } = require('../helpers/function');
+const { getUserList } = require('../controller/admin.controller');
 
-//post Route user/registration to store user details in users collection
-router.post('/registration',userController.registration);
-
-//login post route to login process of user
-router.post('/login',userController.login);
+//get Route to fetch current users
+router.get('/list', checkAdmin, getUserList);
 
 module.exports = router;

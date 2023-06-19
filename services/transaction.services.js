@@ -1,6 +1,6 @@
 const transactionModel = require('../schema/transactions');
-//searchedDetails function returns searched criteria
-exports.searchedDetails = async (search) => {
+//prepareSearchObj function returns searched criteria
+exports.prepareSearchObj = async (search) => {
     const searchObj = {}
     if (search.amount) {
         //if user wants to search transaction by amount than searching is applied while fetching transactions records

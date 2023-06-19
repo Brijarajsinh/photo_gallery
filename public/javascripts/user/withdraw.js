@@ -96,13 +96,19 @@ const withdrawRequestHandler = (function () {
                 allowEscapeKey: false,
             }).then((result) => {
                 if (result.isConfirmed) {
+                    const url = `/withdraw/request/${$(this).attr('id')}/cancel`
+                    Swal.fire({
+                        title: 'Processing',
+                        text: 'Please Wait your withdrawal request will be cancelled soon',
+                        showConfirmButton: false,
+                        allowOutsideClick: false
+                    });
                     $.ajax({
                         type: 'put',
-                        url: `/withdraw/request/${$(this).attr('id')}/cancel`,
-                        async: true,
+                        url: url,
                         success: function (res) {
                             if (res.type == 'success') {
-                                $(`.${res.reqId}`).html(`<button type="button" class="btn btn-dark">Cancelled</button>`);
+                                window.location.reload();
                             }
                             else {
                                 toastr.error(res);

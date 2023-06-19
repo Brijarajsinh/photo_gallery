@@ -123,7 +123,7 @@ const signUpHandler = (function () {
                     //an ajax request with data of user's details to store in users collection
                     $.ajax({
                         type: "post",
-                        url: "/user/registration",
+                        url: "/registration",
                         data: data,
                         success: function (res) {
                             //on error response of ajax request user redirect to login page

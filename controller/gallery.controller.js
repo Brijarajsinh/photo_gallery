@@ -2,12 +2,14 @@ const commonFunction = require('../helpers/function');
 const galleryModel = require('../schema/gallery');
 const { createImgArray } = require('../services/user.services');
 const galleryService = require('../services/gallery.services');
-
+const moment = require('moment');
 //getGallery function render gallery page to the user
 exports.getGallery = async (req, res) => {
     try {
-        const find = await galleryService.findObjImages(req.user._id, req.query);
-        const search = await galleryService.searchedDetails(req.query);
+        const start = moment(Date.now()).subtract(7, 'd').format('yy-MM-DDTHH:mm');
+        const end = moment(Date.now()).format('yy-MM-DDTHH:mm');
+        const find = await galleryService.prepareFindObjImages(req.user._id, req.query);
+        const search = await galleryService.prepareSearchObject(req.query);
         const sort = await commonFunction.prepareSortObj(req.query.sort, req.query.sortOrder);
         const pageSkip = (Number(req.query.page)) ? Number(req.query.page) : 1;
         const limit = 5;
@@ -24,7 +26,9 @@ exports.getGallery = async (req, res) => {
             title: 'Gallery',
             images: images,
             page: page,
-            currentPage: pageSkip
+            currentPage: pageSkip,
+            from: start,
+            to: end
         }
         //if this route is called using ajax request than load data through partials
         if (req.xhr) {

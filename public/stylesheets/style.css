@@ -1,8 +1,13 @@
-body {
-  padding: 50px;
-  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+form .error {
+  color: red
 }
 
-a {
-  color: #00B7FF;
+.image-upload {
+  height: 100px;
+  width: 100px;
+}
+
+.profilePicture {
+  height: 130px;
+  width: 130px;
 }

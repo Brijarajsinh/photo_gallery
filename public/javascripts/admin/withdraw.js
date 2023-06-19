@@ -31,14 +31,19 @@ const withdrawRequestHandler = (function () {
                 cancelButtonColor: '#d33',
                 confirmButtonText: 'Yes, Approve it!',
                 allowOutsideClick: false,
-                allowEscapeKey: false,
-                // showLoaderOnConfirm: true
+                allowEscapeKey: false
             }).then((result) => {
                 if (result.isConfirmed) {
                     const data = {
                         amount: $(this).attr('data-amount'),
                         userId: $(this).attr('data-user-id')
                     }
+                    Swal.fire({
+                        title: 'Approving',
+                        text: 'Please Wait selected withdrawal request will be approved soon',
+                        showConfirmButton: false,
+                        allowOutsideClick: false
+                    });
                     $.ajax({
                         type: 'put',
                         url: `/withdraw/admin/request/${$(this).attr('id')}/${$(this).attr('data-status')}`,
@@ -46,8 +51,7 @@ const withdrawRequestHandler = (function () {
                         async: true,
                         success: function (res) {
                             if (res.type == 'success') {
-                                $(`#${res.reqId}`).html(`<button type="button" class="btn btn-primary">Approved</button>`);
-                                $(`.${res.reqId}`).html('');
+                                window.location.reload();
                             }
                             else {
                                 Swal.fire({
@@ -63,7 +67,7 @@ const withdrawRequestHandler = (function () {
                         error: function (err) {
                             console.log(err.toString());
                         }
-                    })
+                    });
                 }
             })
         });
@@ -85,7 +89,6 @@ const withdrawRequestHandler = (function () {
                 },
                 allowOutsideClick: false,
                 allowEscapeKey: false,
-                // showLoaderOnConfirm: true
                 preConfirm: (value) => {
                     if (!value) {
                         Swal.showValidationMessage(
@@ -100,13 +103,18 @@ const withdrawRequestHandler = (function () {
                         reason: result.value,
                         userId: $(this).attr('data-user-id')
                     }
+                    Swal.fire({
+                        title: 'Rejecting',
+                        text: 'Please Wait selected withdrawal request will be rejected soon',
+                        showConfirmButton: false,
+                        allowOutsideClick: false
+                    });
                     $.ajax({
                         type: 'put',
                         url: `/withdraw/admin/request/${$(this).attr('id')}/${$(this).attr('data-status')}`,
                         data: data,
                         success: function (res) {
-                            $(`#${res.reqId}`).html(`<button type="button" class="btn btn-danger">Rejected</button>`);
-                            $(`.${res.reqId}`).html('');
+                            window.location.reload();
                         },
                         error: function (err) {
                         }

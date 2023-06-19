@@ -5,7 +5,7 @@ require('custom-env').env();
 require('./connection')();
 
 //require general function to convert password in hex code
-const functionUsage = require('./helpers/function');
+const commonFunction = require('./helpers/function');
 
 
 //requiring user schema for checking and entry of admin
@@ -68,14 +68,14 @@ try {
                 "lname": "Mahida",
                 "email": "mahidaroyal123@gmail.com",
                 "gender": "male",
-                "password": functionUsage.generatePasswordHash('Brij@123'),
+                "password": commonFunction.generatePasswordHash('Brij@123'),
                 "phone": "9104881178"
             });
             //stores admin details in users collection
             await admin.save();
             console.log("Admin user created successfully");
         }
-        const settings = await functionUsage.applySettings();
+        const settings = await commonFunction.applySettings();
         await settingModel.updateOne({}, { $set: settings }, { upsert: true });
         console.log("General Settings are applied successfully");
         process.exit(0);

@@ -46,9 +46,9 @@
                                                     <label for="filtering">Filter Uploaded Images By
                                                         Date:</label>
                                                     <input type="datetime-local" class="start-date" value={{#if
-                                                        search.from}}{{search.from}}{{else}}"{{startDate}}"{{/if}} />
+                                                        search.from}}{{search.from}}{{else}}"{{from}}"{{/if}} />
                                                     <input type="datetime-local" class="end-date" value={{#if
-                                                        search.to}}{{search.to}}{{else}}"{{endDate}}"{{/if}} />
+                                                        search.to}}{{search.to}}{{else}}"{{to}}"{{/if}} />
                                                 </div>
                                             </th>
                                             <th>
@@ -87,7 +87,7 @@
                                                     <td>{{originalName}}</td>
                                                     <td class="text-center"><img src="/uploads/gallery/{{image}}"
                                                             class="image-upload"></td>
-                                                    <td>{{dateConvert createdOn}}</td>
+                                                    <td>{{formatDate createdOn}}</td>
                                                     <td>{{charge}}</td>
                                                 </tr>
                                                 {{/each}}

@@ -16,4 +16,80 @@
         </div>
     </div>
 </div>
-<h2 class='ml-1'>Welcome to Dashboard</h2>
+<h2 class='ml-1'>Welcome to Dashboard</h2><br>
+<table>
+    <tr>
+        <th>
+            <div class="nav-item dropdown card-body float-left">
+                <label for="filtering">Filter Registered-users</label>
+                <input type="datetime-local" class="start-date-request" value={{#if
+                    search.from}}{{search.from}}{{else}}"{{from}}"{{/if}} />
+                <input type="datetime-local" class="end-date-request" value={{#if
+                    search.to}}{{search.to}}{{else}}"{{to}}"{{/if}} />
+            </div>
+            <div class="nav-item dropdown card-body float-right">
+                <input type="button" class="btn-primary apply-registered-users" value="Apply"
+                    id="registered-users-graph" />
+                <input type="button" class="btn-danger clear-user-graph" value="Clear" />
+            </div>
+        </th>
+        <th>
+            <div class="nav-item dropdown card-body float-left">
+                <label for="filtering">Filter Registered-users</label>
+                <input type="datetime-local" class="start-date-request" value={{#if
+                    search.from}}{{search.from}}{{else}}"{{from}}"{{/if}} />
+                <input type="datetime-local" class="end-date-request" value={{#if
+                    search.to}}{{search.to}}{{else}}"{{to}}"{{/if}} />
+            </div>
+            <div class="nav-item dropdown card-body float-right">
+                <input type="button" class="btn-primary apply-withdrawal-amount" value="Apply"
+                    id="approve-withdrawal-graph" />
+                <input type="button" class="btn-danger clear-withdraw-amount-graph" value="Clear" />
+            </div>
+        </th>
+    </tr>
+</table>
+<div class="adminDashboard d-flex p-2">
+    <canvas id="userRegisteredGraph" style="max-width:50%"></canvas>
+    <canvas id="approveWithdrawalAmount" style="max-width:50%"></canvas>
+</div>
+
+<script>
+    const xValues = ["India","Italy", "France", "Spain", "USA", "Argentina"];
+    const yValues = [100,55, 49, 44, 24, 15];
+    const barColors = ["red", "green", "blue", "orange", "brown"];
+    new Chart("userRegisteredGraph", {
+        type: "bar",
+        data: {
+            labels: xValues,
+            datasets: [{
+                backgroundColor: barColors,
+                data: yValues
+            }]
+        },
+        options: {
+            legend: { display: false },
+            title: {
+                display: true,
+                text: "user registered in photo gallery affiliate marketing"
+            }
+        }
+    });
+    new Chart("approveWithdrawalAmount", {
+        type: "bar",
+        data: {
+            labels: xValues,
+            datasets: [{
+                backgroundColor: barColors,
+                data: yValues
+            }]
+        },
+        options: {
+            legend: { display: false },
+            title: {
+                display: true,
+                text: "Withdrawal amount from photo gallery affiliate marketing"
+            }
+        }
+    });
+</script>

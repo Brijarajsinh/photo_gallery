@@ -64,8 +64,6 @@ module.exports = {
             }
         ));
         passport.serializeUser(function (req, user, done) {
-            console.log("serializeUser");
-            console.log(req.user);
             done(null, user);
         });
         passport.deserializeUser(async function (req, user, done) {
@@ -78,9 +76,6 @@ module.exports = {
                     availableCoins: 1,
                     profile: 1
                 }).lean();
-
-                console.log("deserializeUser");
-                console.log(currentUser);
                 done(null, currentUser);
             } catch (error) {
                 console.log(error);
@@ -90,7 +85,7 @@ module.exports = {
 
     //function checks user is authenticated or not 
     // for purpose of restricting access other functionalities/routes without login
-    commonMiddleware: function (req, res, next) {
+    isAuth: function (req, res, next) {
         if (req.isAuthenticated()) {
             return next();
         }

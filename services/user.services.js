@@ -1,11 +1,11 @@
-const functionUsage = require('../helpers/function');
+const commonFunction = require('../helpers/function');
 const UserModel = require('../schema/userSchema');
 const { storeTransaction } = require('./transaction.services');
 
 //applyReferBonus function applies referral bonus to the applicable user
 exports.applyReferBonus = async (user) => {
     const _this = this;
-    const referralBonus = await functionUsage._getReferralBonus()
+    const referralBonus = await commonFunction._getReferralBonus()
     await UserModel.updateOne({
         "_id": user
     },
@@ -35,9 +35,9 @@ exports.createUserRegistrationObject = async (user) => {
         "email": user.email,
         "gender": user.gender,
         "phone": user.phone,
-        "password": functionUsage.generatePasswordHash(user.password),
-        "referLink": await functionUsage.generateReferLink(6),
-        "availableCoins": await functionUsage.getWelcomeBonus()
+        "password": commonFunction.generatePasswordHash(user.password),
+        "referLink": await commonFunction.generateReferLink(6),
+        "availableCoins": await commonFunction.getWelcomeBonus()
     }
     return userObj;
 };
@@ -67,7 +67,6 @@ exports.createImgArray = async (imageCount, userId, images, cost) => {
         };
         uploadImages.push(imageDetails);
     }
-    console.log(uploadImages);
     return uploadImages;
 };
 

@@ -50,7 +50,6 @@
             </div>
         </div>
     </div>
-
     <div class="card card-md">
         <div class="card-body">
             <b>
@@ -73,9 +72,9 @@
                                                     <label for="filtering">Filter Requests By
                                                         Date:</label>
                                                     <input type="datetime-local" class="start-date" value={{#if
-                                                        search.from}}{{search.from}}{{else}}"{{startDate}}"{{/if}} />
+                                                        search.from}}{{search.from}}{{else}}"{{from}}"{{/if}} />
                                                     <input type="datetime-local" class="end-date" value={{#if
-                                                        search.to}}{{search.to}}{{else}}"{{endDate}}"{{/if}} />
+                                                        search.to}}{{search.to}}{{else}}"{{to}}"{{/if}} />
                                                 </div>
                                             </th>
                                             <th>
@@ -129,19 +128,21 @@
                                                 {{#if requests}}
                                                 {{#each requests}}
                                                 <tr>
-                                                    <td>{{dateConvert createdOn}}</td>
+                                                    <td>{{formatDate createdOn}}</td>
                                                     <td>{{amount}}</td>
                                                     {{#compare status "==" 'pending'}}
                                                     <td class="{{_id}}">
                                                         <button type="button" class="btn btn-success">Pending</button>
                                                         <button type="button" class="btn btn-secondary cancel-request"
-                                                            id="{{_id}}">Cancel</button>
+                                                            id="{{_id}}">
+                                                            Cancel</button>
                                                     </td>
                                                     {{/compare}}
                                                     {{#compare status '==' 'rejected'}}
                                                     <td class="{{_id}}">
                                                         <button type="button" class="btn btn-danger">Rejected</button>
-                                                        <button title="{{description}}" type="button" class="btn btn-info view-status"
+                                                        <button title="{{description}}" type="button"
+                                                            class="btn btn-info view-status"
                                                             data-reason="{{_id}}">Reason</button>
                                                     </td>
                                                     {{/compare}}

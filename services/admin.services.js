@@ -19,20 +19,18 @@ exports.applySettings = function (req) {
         const settings = req;
         return settings;
     }
-    else {
-        //Otherwise set a general settings value from the env variable
-        const settings = {
-            welcomeBonus: process.env.welcomeBonus,
-            referralBonus: process.env.referralBonus,
-            chargePerImage: process.env.chargePerImage,
-            maxRefer: process.env.maxRefer
-        }
-        return settings;
+    //Otherwise set a general settings value from the env variable
+    const settings = {
+        welcomeBonus: process.env.welcomeBonus,
+        referralBonus: process.env.referralBonus,
+        chargePerImage: process.env.chargePerImage,
+        maxRefer: process.env.maxRefer
     }
+    return settings;
 };
 
 //Prepares and returns searching object to fetch details of users in user-list table
-exports.findObj = function (searchVal) {
+exports.prepareFindObj = function (searchVal) {
     const findObj = {
         role: "user"
     }

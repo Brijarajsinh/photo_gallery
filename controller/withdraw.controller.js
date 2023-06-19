@@ -4,11 +4,15 @@ const commonFunction = require('../helpers/function');
 const withdrawService = require('../services/withdrawal.services');
 const mailer = require('../mailer');
 const { default: mongoose } = require('mongoose');
+const moment = require('moment');
+
 
 //getWithdrawRequestAdminSide function fetches all withdrawal request of all user and display requests user side
 //on selection of user and filter by status fetches that selected filter's withdrawal requests
 exports.getWithdrawRequestAdminSide = async (req, res) => {
     try {
+        const start = moment(Date.now()).subtract(7, 'd').format('yy-MM-DDTHH:mm');
+        const end = moment(Date.now()).format('yy-MM-DDTHH:mm');
         const find = await withdrawService.prepareFindObj(req.user.role, req.query.from, req.query.to, req.query.status, req.query.user);
         const search = await withdrawService.prepareSearchObj(req.user.role, req.query.from, req.query.to, req.query.status, req.query.user);
         const sort = await commonFunction.prepareSortObj(req.query.sort, req.query.sortOrder);
@@ -60,12 +64,15 @@ exports.getWithdrawRequestAdminSide = async (req, res) => {
             users: users,
             requests: withdrawRequest,
             page: page,
-            currentPage: pageSkip
+            currentPage: pageSkip,
+            from: start,
+            to: end
         }
         if (req.xhr) {
             response['layout'] = 'blank';
             response['search'] = search;
         }
+
         res.render('admin/withdraw', response);
     } catch (error) {
         console.log("Error Generated In rendering Withdraw Page");
@@ -86,6 +93,7 @@ exports.updateWithdrawRequest = async (req, res) => {
         const amount = req.body.amount;
         const requestDetails = {
             'status': status,
+            'actionPerformedAt': Date.now()
         }
         //Admin perform reject action on pending withdrawal request
         if (req.body.reason) {
@@ -106,17 +114,17 @@ exports.updateWithdrawRequest = async (req, res) => {
                     'userId': userId,
                     'message': `Admin can't Approve Your Withdraw Request,${amount} coin not available in your wallet.`
                 });
-                throw "Insufficient Balance to Withdraw"
+                console.log("Insufficient balance");
+                // throw "Insufficient Balance to Withdraw"
             }
             else {
                 //else deduct requested coins from user's wallet and store hte entry in transaction collection
-                //    await withdrawService.deductWithdrawAmount(userId, amount);
+                //await withdrawService.deductWithdrawAmount(userId, amount);
             }
         }
         // await withdrawModel.updateOne({
         //     "_id": reqId
         // }, requestDetails);
-
 
         const sendMailTo = await withdrawModel.aggregate([
             {
@@ -147,16 +155,14 @@ exports.updateWithdrawRequest = async (req, res) => {
                 $project: {
                     "_id": 0,
                     "createdOn": 1,
-                    "updatedOn": 1,
+                    "actionPerformedAt": 1,
                     "description": 1,
                     "amount": 1,
                     "requestedBy": { $arrayElemAt: ["$requestedBy", 0] }
                 }
             }
         ]);
-        console.log(sendMailTo[0]);
         const info = await mailer.sendMail(await commonFunction.mailContent(sendMailTo[0], status));
-        console.log(`Message Sent SuccessFully`);
 
         res.send({
             type: 'success',
@@ -175,6 +181,8 @@ exports.updateWithdrawRequest = async (req, res) => {
 //getWithdrawRequestUserSide function get all withdrawal request of current logged-in user
 exports.getWithdrawRequestUserSide = async (req, res) => {
     try {
+        const start = moment(Date.now()).subtract(7, 'd').format('yy-MM-DDTHH:mm');
+        const end = moment(Date.now()).format('yy-MM-DDTHH:mm');
         const find = await withdrawService.prepareFindObj(req.user.role, req.query.from, req.query.to, req.query.status, req.user._id);
         const search = await withdrawService.prepareSearchObj(req.user.role, req.query.from, req.query.to, req.query.status);
         const sort = await commonFunction.prepareSortObj(req.query.sort, req.query.sortOrder);
@@ -197,7 +205,9 @@ exports.getWithdrawRequestUserSide = async (req, res) => {
             title: 'Withdraw',
             requests: withdrawRequest,
             page: page,
-            currentPage: pageSkip
+            currentPage: pageSkip,
+            from: start,
+            to: end
         }
         if (req.xhr) {
             response['layout'] = 'blank';
@@ -246,15 +256,16 @@ exports.withdrawCoinRequest = async (req, res) => {
 exports.cancelWithdrawRequest = async (req, res) => {
     try {
         const reqId = req.params.reqId;
-        await withdrawModel.updateOne({
-            "_id": reqId
-        }, {
-            "status": "cancelled"
-        });
+        console.log(req.query);
+        // await withdrawModel.updateOne({
+        //     "_id": reqId
+        // }, {
+        //     "status": "cancelled"
+        // });
         res.send({
-            type: 'success',
-            reqId: reqId
+            type: 'success'
         });
+
     } catch (error) {
         console.log("Error generated while updating status of withdraw request");
         console.log(error);

@@ -1,7 +1,7 @@
 //requiring model to work with collection of that models
 const settingModel = require('../schema/generalSettings');
 const userModel = require('../schema/userSchema');
-const functionUsage = require('../helpers/function');
+const commonFunction = require('../helpers/function');
 
 
 //requiring admin services to get current setting,apply current setting prepares find object with search value and prepares sortObj to perform sorting
@@ -41,12 +41,11 @@ exports.updateGeneralSettings = async (req, res, next) => {
     }
 };
 
-
 //getUserList controller displays users of photo gallery application
 exports.getUserList = async (req, res) => {
     try {
-        const find = await adminServices.findObj(req.query.search);
-        const sort = await functionUsage.prepareSortObj(req.query.sort, req.query.sortOrder);
+        const find = await adminServices.prepareFindObj(req.query.search);
+        const sort = await commonFunction.prepareSortObj(req.query.sort, req.query.sortOrder);
         const pageSkip = (Number(req.query.page)) ? Number(req.query.page) : 1;
         const limit = 2;
         const skip = (pageSkip - 1) * limit;
@@ -67,7 +66,7 @@ exports.getUserList = async (req, res) => {
         );
         //generates pages by dividing total users displayed in one page
         const pageCount = Math.ceil(totalUsers / limit);
-        const page = await functionUsage.createPagination(pageCount);
+        const page = await commonFunction.createPagination(pageCount);
         const response = {
             title: 'Users',
             users: currentUsers,

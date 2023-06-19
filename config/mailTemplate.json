@@ -1,0 +1,12 @@
+{
+    "approveWithdrawRequest": {
+        "subject": "Withdrawal Request Status Updates keyStatus",
+        "text": "Withdrawal Request is Approved",
+        "html": "<h1>Congratulations keyFullName,<h1><br><h3>Your Withdrawal Request of keyAmount coin requested on keyRequested is approved by admin of Photo Gallery Affiliate Marketing on keyActionPerformed. </h3><br> <h4>Your Available Coins in Wallet is keyAvailableCoins.</h4>"
+    },
+    "rejectWithdrawRequest": {
+        "subject": "Withdrawal Request Status Updates keyStatus",
+        "text": "Withdrawal Request is Rejected",
+        "html": "<h1>Sorry keyFullName,<h1><br><h3>Your Withdrawal Request of keyAmount coin requested on keyRequested is rejected by admin of Photo Gallery Affiliate Marketing on keyActionPerformed. </h3><br><h4>Reason for Rejection of Withdrawal Request keyDescription.</h4>"
+    }
+}
