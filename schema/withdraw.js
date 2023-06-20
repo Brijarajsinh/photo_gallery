@@ -30,7 +30,7 @@ const withdrawSchema = new mongoose.Schema({
     description: {
         type: String
     },
-    actionPerformedAt:{
+    actionPerformedOn:{
         type:Date
     }
 }, option);

@@ -115,17 +115,17 @@ exports.updateWithdrawRequest = async (req, res) => {
                     'message': `Admin can't Approve Your Withdraw Request,${amount} coin not available in your wallet.`
                 });
                 console.log("Insufficient balance");
-                // throw "Insufficient Balance to Withdraw"
+                throw "Insufficient Balance to Withdraw"
             }
-            else {
-                //else deduct requested coins from user's wallet and store hte entry in transaction collection
-                //await withdrawService.deductWithdrawAmount(userId, amount);
-            }
+            //else deduct requested coins from user's wallet and store hte entry in transaction collection
+            await withdrawService.deductWithdrawAmount(userId, amount);
         }
-        // await withdrawModel.updateOne({
-        //     "_id": reqId
-        // }, requestDetails);
+        //update the pending withdrawal request from pending to approved or rejected based on admin action
+        await withdrawModel.updateOne({
+            "_id": reqId
+        }, requestDetails);
 
+        
         const sendMailTo = await withdrawModel.aggregate([
             {
                 $match: {
@@ -155,7 +155,7 @@ exports.updateWithdrawRequest = async (req, res) => {
                 $project: {
                     "_id": 0,
                     "createdOn": 1,
-                    "actionPerformedAt": 1,
+                    "actionPerformedOn": 1,
                     "description": 1,
                     "amount": 1,
                     "requestedBy": { $arrayElemAt: ["$requestedBy", 0] }

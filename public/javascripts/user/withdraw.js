@@ -25,8 +25,9 @@ const withdrawRequestHandler = (function () {
 
     withdrawCoinHandler = function () {
         $(document).off('click', '.withdraw-coin').on('click', '.withdraw-coin', function () {
+            console.log("btn-clicked");
             $("#withdraw-request-form").validate({
-                keypress: true,
+                // keypress: true,
                 errorClass: 'error',
                 validClass: 'success',
                 errorElement: 'span',
@@ -47,7 +48,7 @@ const withdrawRequestHandler = (function () {
                     "withdraw": {
                         required: "Please Enter Coins To Withdraw",
                         min: "Please Enter Minimum 1 coin to Withdraw",
-                        max: "You Can Withdraw Maximum 100 Coins At a Time",
+                        max: "You Can Withdraw Maximum 1000 Coins At a Time",
                         remote: "Insufficient Coins In Your Wallet To Withdraw"
                     }
                 },
@@ -70,7 +71,7 @@ const withdrawRequestHandler = (function () {
                             }
                             //on success response of ajax request user redirect to timeline page
                             else {
-                                window.location.reload();
+                                window.location.replace("http://localhost:3000/withdraw/request");
                             }
                         },
                         error: function (err) {

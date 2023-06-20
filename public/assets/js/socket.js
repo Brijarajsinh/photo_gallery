@@ -1,5 +1,5 @@
 /*!
- * Socket.IO v4.6.2
+ * Socket.IO v4.6.1
  * (c) 2014-2023 Guillermo Rauch
  * Released under the MIT License.
  */
@@ -2681,12 +2681,6 @@
     }
   
     /**
-     * These strings must not be used as event names, as they have a special meaning.
-     */
-  
-    var RESERVED_EVENTS$1 = ["connect", "connect_error", "disconnect", "disconnecting", "newListener", "removeListener" // used by the Node.js EventEmitter
-    ];
-    /**
      * Protocol version.
      *
      * @public
@@ -2795,17 +2789,12 @@
       }]);
   
       return Encoder;
-    }(); // see https://stackoverflow.com/questions/8511281/check-if-a-value-is-an-object-in-javascript
-  
-    function isObject(value) {
-      return Object.prototype.toString.call(value) === "[object Object]";
-    }
+    }();
     /**
      * A socket.io Decoder instance
      *
      * @return {Object} decoder
      */
-  
   
     var Decoder = /*#__PURE__*/function (_Emitter) {
       _inherits(Decoder, _Emitter);
@@ -2985,17 +2974,17 @@
         value: function isPayloadValid(type, payload) {
           switch (type) {
             case PacketType.CONNECT:
-              return isObject(payload);
+              return _typeof(payload) === "object";
   
             case PacketType.DISCONNECT:
               return payload === undefined;
   
             case PacketType.CONNECT_ERROR:
-              return typeof payload === "string" || isObject(payload);
+              return typeof payload === "string" || _typeof(payload) === "object";
   
             case PacketType.EVENT:
             case PacketType.BINARY_EVENT:
-              return Array.isArray(payload) && (typeof payload[0] === "number" || typeof payload[0] === "string" && RESERVED_EVENTS$1.indexOf(payload[0]) === -1);
+              return Array.isArray(payload) && payload.length > 0;
   
             case PacketType.ACK:
             case PacketType.BINARY_ACK:

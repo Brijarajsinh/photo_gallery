@@ -38,15 +38,16 @@
                 </div>
                 <div class="modal-body">
                     <form id="withdraw-request-form">
-                        <label class="form-label">Withdraw Amount:-<sup class="text-danger">*</sup></label><br>
+                        <label class="form-label">Withdraw Amount<sup class="text-danger">*</sup></label><br>
                         <input type="number" name="withdraw" placeholder="Enter Coins To Withdraw"
                             class="withdraw w-100" min="1" max="100" required />
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                            <input type="submit" class="btn btn-primary withdraw-coin" value="Send Request">
+                        </div>
+                    </form>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                    <input type="submit" class="btn btn-primary withdraw-coin" value="Send Request">
-                </div>
-                </form>
+
             </div>
         </div>
     </div>

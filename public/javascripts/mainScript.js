@@ -8,6 +8,7 @@ if ("{{user.role}}" == 'admin') {
     });
 
     socket.on("withdrawRequest", (data) => {
+      console.log("REQUEST ARRIVED");
       toastr.success(`Withdraw Requested by ${data.userName}`);
     });
   }

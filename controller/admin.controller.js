@@ -2,10 +2,11 @@
 const settingModel = require('../schema/generalSettings');
 const userModel = require('../schema/userSchema');
 const commonFunction = require('../helpers/function');
-
+const moment = require('moment');
 
 //requiring admin services to get current setting,apply current setting prepares find object with search value and prepares sortObj to perform sorting
 const adminServices = require('../services/admin.services');
+const { success } = require('toastr');
 
 //getGeneralSettings function fetches current general-settings
 exports.getGeneralSettings = async (req, res, next) => {
@@ -83,5 +84,57 @@ exports.getUserList = async (req, res) => {
     } catch (error) {
         console.log("Error Generated While Admin access userList Page");
         console.log(error);
+    }
+};
+
+exports.prepareUserStatistics = async (req, res) => {
+    try {
+        const start = req.query.from ? req.query.from : moment(Date.now()).subtract(6, 'd').format('yyyy-MM-DD');
+        const end = req.query.to ? req.query.to : moment(Date.now()).format('yyyy-MM-DD');
+        const searchObj = {};
+        const dateArray = [];
+        const users = [];
+        searchObj.from = start;
+        searchObj.to = end;
+
+        // console.log(Date(start));
+        // console.log(Date(end));
+
+        // console.log(moment(Date(start), 'yyyy-MM-DD 00:00:00z').utc());
+        // console.log(moment(Date(start), 'yyyy-MM-DD 23:59:59z').utc().endOf());
+
+        for (let i = Number(start.slice(-2)); i <= Number(end.slice(-2)); i++) {
+            const year = Number(start.slice(0, 4))
+            const month = Number(start.slice(5, 7))
+            const date = `${i}/${month}/${year}`
+            dateArray.push(date);
+        }
+        const user = await userModel.aggregate([
+            {
+                $group: {
+                    _id: {
+                        day: { $dayOfMonth: "$createdOn" },
+                        month: { $month: "$createdOn" },
+                        year: { $year: "$createdOn" }
+                    },
+                    total: {
+                        $sum: 1
+                    }
+                }
+            }
+        ]);
+        console.log(user);
+        res.send({
+            type: 'success',
+            search: searchObj,
+            dateArray: dateArray,
+            //countUserArray: users
+        });
+    } catch (error) {
+        console.log("Error Generated While Admin Created User-statistics");
+        console.log(error);
+        res.send({
+            type: 'error'
+        });
     }
 };
