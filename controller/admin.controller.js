@@ -109,7 +109,7 @@ exports.prepareUserStatistics = async (req, res) => {
             }
             //creating dateArray which is passed in response as x-axis of graph
             for (let i = 0; i < totalDates; i++) {
-                dateArray.push(moment(start).add(i, 'months').format('DD-MM-YYYY'))
+                dateArray.push(moment(start).add(i, 'months').format('MM-YYYY'))
             }
         } else {
             conditionOnGetRecord = {
@@ -132,6 +132,11 @@ exports.prepareUserStatistics = async (req, res) => {
         //fetch users from db which is registered in between the range
         const user = await userModel.aggregate([
             {
+                $match: {
+                    'role': "user"
+                }
+            },
+            {
                 $group: {
                     _id: conditionOnGetRecord,
                     date: { $first: "$createdOn" },
@@ -141,15 +146,13 @@ exports.prepareUserStatistics = async (req, res) => {
                 }
             }
         ]);
+        console.log(user);
+        console.log(dateArray);
         //updating users array with registered-user's count and pass that array in response for creating y-axis of graph
         for (let index of user) {
-            const indexOF = dateArray.indexOf(moment(index.date).format('DD-MM-yyyy'))
+            const indexOF = dateArray.indexOf(moment(index.date).format('MM-yyyy'))
             if (indexOF > -1) users[indexOF] = index.total
         }
-
-        console.log("USER-REGISTRATION");
-        console.log(searchObj);
-        console.log(dateArray);
         console.log(users);
         res.send({
             type: 'success',
