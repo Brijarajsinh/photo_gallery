@@ -96,8 +96,32 @@ exports.prepareUserStatistics = async (req, res) => {
         const start = req.query.from ? req.query.from : moment(Date.now()).subtract(6, 'd').format('yyyy-MM-DD');
         const end = req.query.to ? req.query.to : moment(Date.now()).format('yyyy-MM-DD');
 
+
+        const dateArray = [];
+        let conditionOnGetRecord = {}
         //prepare initial array with default value 0 upto count of selected dates by admin
-        const totalDates = moment(end).diff(moment(start), 'days') + 1;
+        let totalDates = moment(end).diff(moment(start), 'days') + 1;
+        if (totalDates > 30) {
+            totalDates = moment(end).diff(moment(start), 'months') + 1;
+            conditionOnGetRecord = {
+                month: { $month: "$createdOn" },
+                year: { $year: "$createdOn" }
+            }
+            //creating dateArray which is passed in response as x-axis of graph
+            for (let i = 0; i < totalDates; i++) {
+                dateArray.push(moment(start).add(i, 'months').format('DD-MM-YYYY'))
+            }
+        } else {
+            conditionOnGetRecord = {
+                day: { $dayOfMonth: "$createdOn" },
+                month: { $month: "$createdOn" },
+                year: { $year: "$createdOn" }
+            }
+            //creating dateArray which is passed in response as x-axis of graph
+            for (let i = 0; i < totalDates; i++) {
+                dateArray.push(moment(start).add(i, 'days').format('DD-MM-YYYY'))
+            }
+        }
         const users = Array(totalDates).fill(0);
 
         //creating searchObj which is passed in response to set filtered value is selected
@@ -105,22 +129,11 @@ exports.prepareUserStatistics = async (req, res) => {
             from: start,
             to: end
         };
-
-        //creating dateArray which is passed in response as x-axis of graph
-        const dateArray = [];
-        for (let i = 0; i < totalDates; i++) {
-            dateArray.push(moment(start).add(i, 'days').format('DD-MM-YYYY'))
-        }
-
         //fetch users from db which is registered in between the range
         const user = await userModel.aggregate([
             {
                 $group: {
-                    _id: {
-                        day: { $dayOfMonth: "$createdOn" },
-                        month: { $month: "$createdOn" },
-                        year: { $year: "$createdOn" }
-                    },
+                    _id: conditionOnGetRecord,
                     date: { $first: "$createdOn" },
                     total: {
                         $sum: 1
@@ -128,13 +141,16 @@ exports.prepareUserStatistics = async (req, res) => {
                 }
             }
         ]);
-
         //updating users array with registered-user's count and pass that array in response for creating y-axis of graph
         for (let index of user) {
             const indexOF = dateArray.indexOf(moment(index.date).format('DD-MM-yyyy'))
             if (indexOF > -1) users[indexOF] = index.total
         }
 
+        console.log("USER-REGISTRATION");
+        console.log(searchObj);
+        console.log(dateArray);
+        console.log(users);
         res.send({
             type: 'success',
             search: searchObj,
@@ -159,7 +175,22 @@ exports.prepareWithdrawalStatistics = async (req, res) => {
         const end = req.query.to ? req.query.to : moment(Date.now()).format('yyyy-MM-DD');
 
         //prepare initial array with default value 0 upto count of selected dates by admin
-        const totalDates = moment(end).diff(moment(start), 'days') + 1;
+        let totalDates = moment(end).diff(moment(start), 'days') + 1;
+
+        if (totalDates > 30) {
+            totalDates = moment(end).diff(moment(start), 'months') + 1;
+            conditionOnGetRecord = {
+                month: { $month: "$updatedOn" },
+                year: { $year: "$updatedOn" }
+            }
+        } else {
+            conditionOnGetRecord = {
+                day: { $dayOfMonth: "$updatedOn" },
+                month: { $month: "$updatedOn" },
+                year: { $year: "$updatedOn" }
+            }
+        }
+
         const amount = Array(totalDates).fill(0);
 
         //creating searchObj which is passed in response to set filtered value is selected
@@ -183,11 +214,7 @@ exports.prepareWithdrawalStatistics = async (req, res) => {
             },
             {
                 $group: {
-                    _id: {
-                        day: { $dayOfMonth: "$updatedOn" },
-                        month: { $month: "$updatedOn" },
-                        year: { $year: "$updatedOn" }
-                    },
+                    _id: conditionOnGetRecord,
                     date: { $first: "$updatedOn" },
                     total: {
                         $sum: "$amount"
@@ -201,7 +228,10 @@ exports.prepareWithdrawalStatistics = async (req, res) => {
             const indexOF = dateArray.indexOf(moment(index.date).format('DD-MM-yyyy'))
             if (indexOF > -1) amount[indexOF] = index.total
         }
-
+        console.log("WITHDRAWAL-AMOUNT");
+        console.log(searchObj);
+        console.log(dateArray);
+        console.log(amount);
         res.send({
             type: 'success',
             search: searchObj,

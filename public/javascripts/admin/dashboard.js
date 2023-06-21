@@ -127,14 +127,17 @@ const adminDashboardHandler = function () {
     const _this = this;
 };
 $(function () {
+    const today = moment(new Date()).format('YYYY-MM-DD');
     $(".date-picker-user-graph").daterangepicker({
         startDate: moment().subtract(6, 'day'),
+        endDate: today,
         locale: {
             format: 'YYYY-MM-DD'
-        }
+        },
     });
     $(".date-picker-approved-request-graph").daterangepicker({
         startDate: moment().subtract(6, 'day'),
+        endDate: today,
         locale: {
             format: 'YYYY-MM-DD'
         }
