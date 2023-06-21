@@ -16,41 +16,46 @@
         </div>
     </div>
 </div>
-<h2 class='ml-1'>Welcome to Dashboard</h2><br>
-<table>
-    <tr>
-        <th>
+
+<div class="col-lg-6">
+    <div class="card">
+        <div class="card-header">
             <div class="nav-item dropdown card-body float-left">
                 <label for="filtering">Filter Registered-users</label>
-                <input type="date" class="start-date-user-graph" />
-                <input type="date" class="end-date-user-graph" />
+                <input type="text" class="date-picker-user-graph" />
+                {{!-- <input type="date" class="end-date-user-graph" /> --}}
             </div>
             <div class="nav-item dropdown card-body float-right">
-                <input type="button" class="btn-primary apply-registered-users" value="Apply"
+                <input type="button" class="btn-primary apply-registered-users-statistics" value="Apply"
                     id="registered-users-graph" />
                 <input type="button" class="btn-danger clear-user-graph" value="Clear" />
             </div>
-        </th>
-        {{!-- <th>
+        </div>
+        <div class="card-body">
+            <h4 class="mb-3">Registered User's Statistics</h4>
+            <canvas id="user-chart"></canvas>
+        </div>
+    </div>
+</div><!-- /# column -->
+
+<div class="col-lg-6">
+    <div class="card">
+        <div class="card-header">
             <div class="nav-item dropdown card-body float-left">
-                <label for="filtering">Filter Registered-users</label>
-                <input type="date" class="start-date-request" value={{#if
-                    search.from}}{{search.from}}{{else}}"{{from}}"{{/if}} />
-                <input type="date" class="end-date-request" value={{#if
-                    search.to}}{{search.to}}{{else}}"{{to}}"{{/if}} />
+                <label for="filtering">Filter Approved Withdrawal Requests</label>
+                <input type="text" class="date-picker-approved-request-graph" />
+                {{!-- <input type="date" class="end-date-user-graph" /> --}}
             </div>
             <div class="nav-item dropdown card-body float-right">
-                <input type="button" class="btn-primary apply-withdrawal-amount" value="Apply"
-                    id="approve-withdrawal-graph" />
-                <input type="button" class="btn-danger clear-withdraw-amount-graph" value="Clear" />
+                <input type="button" class="btn-primary apply-approved-request-statistics" value="Apply"
+                    id="registered-users-graph" />
+                <input type="button" class="btn-danger clear-approved-request-graph" value="Clear" />
             </div>
-        </th> --}}
-    </tr>
-</table>
-
-<div class="adminDashboard d-flex p-2">
-    <canvas id="userRegisteredGraph" style="max-width:50%"></canvas>
-    <canvas id="approveWithdrawalAmount" style="max-width:50%"></canvas>
-</div>
-
+        </div>
+        <div class="card-body">
+            <h4 class="mb-3">Registered User's Statistics</h4>
+            <canvas id="approved-request-chart"></canvas>
+        </div>
+    </div>
+</div><!-- /# column -->
 <script src="/javascripts/admin/dashboard.js"></script>

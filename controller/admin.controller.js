@@ -1,6 +1,7 @@
 //requiring model to work with collection of that models
 const settingModel = require('../schema/generalSettings');
 const userModel = require('../schema/userSchema');
+const withdrawModel = require('../schema/withdraw');
 const commonFunction = require('../helpers/function');
 const moment = require('moment');
 
@@ -87,28 +88,31 @@ exports.getUserList = async (req, res) => {
     }
 };
 
+//prepareUserStatistics prepares two array and send them as response to create graph of user registered statistics
 exports.prepareUserStatistics = async (req, res) => {
     try {
+        //if range passed in query than get that 
+        //otherwise range is upto last 7 day from current day
         const start = req.query.from ? req.query.from : moment(Date.now()).subtract(6, 'd').format('yyyy-MM-DD');
         const end = req.query.to ? req.query.to : moment(Date.now()).format('yyyy-MM-DD');
-        const searchObj = {};
+
+        //prepare initial array with default value 0 upto count of selected dates by admin
+        const totalDates = moment(end).diff(moment(start), 'days') + 1;
+        const users = Array(totalDates).fill(0);
+
+        //creating searchObj which is passed in response to set filtered value is selected
+        const searchObj = {
+            from: start,
+            to: end
+        };
+
+        //creating dateArray which is passed in response as x-axis of graph
         const dateArray = [];
-        const users = [];
-        searchObj.from = start;
-        searchObj.to = end;
-
-        // console.log(Date(start));
-        // console.log(Date(end));
-
-        // console.log(moment(Date(start), 'yyyy-MM-DD 00:00:00z').utc());
-        // console.log(moment(Date(start), 'yyyy-MM-DD 23:59:59z').utc().endOf());
-
-        for (let i = Number(start.slice(-2)); i <= Number(end.slice(-2)); i++) {
-            const year = Number(start.slice(0, 4))
-            const month = Number(start.slice(5, 7))
-            const date = `${i}/${month}/${year}`
-            dateArray.push(date);
+        for (let i = 0; i < totalDates; i++) {
+            dateArray.push(moment(start).add(i, 'days').format('DD-MM-YYYY'))
         }
+
+        //fetch users from db which is registered in between the range
         const user = await userModel.aggregate([
             {
                 $group: {
@@ -117,24 +121,100 @@ exports.prepareUserStatistics = async (req, res) => {
                         month: { $month: "$createdOn" },
                         year: { $year: "$createdOn" }
                     },
+                    date: { $first: "$createdOn" },
                     total: {
                         $sum: 1
                     }
                 }
             }
         ]);
-        console.log(user);
+
+        //updating users array with registered-user's count and pass that array in response for creating y-axis of graph
+        for (let index of user) {
+            const indexOF = dateArray.indexOf(moment(index.date).format('DD-MM-yyyy'))
+            if (indexOF > -1) users[indexOF] = index.total
+        }
+
         res.send({
             type: 'success',
             search: searchObj,
             dateArray: dateArray,
-            //countUserArray: users
+            countUserArray: users
         });
     } catch (error) {
         console.log("Error Generated While Admin Created User-statistics");
         console.log(error);
         res.send({
             type: 'error'
+        });
+    }
+};
+
+//prepareWithdrawalStatistics prepares two array for creating statistics of withdrawal amount approved
+exports.prepareWithdrawalStatistics = async (req, res) => {
+    try {
+        //if range passed in query than get that 
+        //otherwise range is upto last 7 day from current day
+        const start = req.query.from ? req.query.from : moment(Date.now()).subtract(6, 'd').format('yyyy-MM-DD');
+        const end = req.query.to ? req.query.to : moment(Date.now()).format('yyyy-MM-DD');
+
+        //prepare initial array with default value 0 upto count of selected dates by admin
+        const totalDates = moment(end).diff(moment(start), 'days') + 1;
+        const amount = Array(totalDates).fill(0);
+
+        //creating searchObj which is passed in response to set filtered value is selected
+        const searchObj = {
+            from: start,
+            to: end
+        };
+
+        //creating dateArray which is passed in response as x-axis of graph
+        const dateArray = [];
+        for (let i = 0; i < totalDates; i++) {
+            dateArray.push(moment(start).add(i, 'days').format('DD-MM-YYYY'))
+        }
+
+        //fetch approved withdrawal request from db which is approved by admin in that range
+        const withdrawRequest = await withdrawModel.aggregate([
+            {
+                $match: {
+                    'status': "approved"
+                }
+            },
+            {
+                $group: {
+                    _id: {
+                        day: { $dayOfMonth: "$updatedOn" },
+                        month: { $month: "$updatedOn" },
+                        year: { $year: "$updatedOn" }
+                    },
+                    date: { $first: "$updatedOn" },
+                    total: {
+                        $sum: "$amount"
+                    }
+                }
+            }
+        ]);
+
+        //updating amount array with withdrawal-amount and pass that array in response for creating y-axis of graph
+        for (let index of withdrawRequest) {
+            const indexOF = dateArray.indexOf(moment(index.date).format('DD-MM-yyyy'))
+            if (indexOF > -1) amount[indexOF] = index.total
+        }
+
+        res.send({
+            type: 'success',
+            search: searchObj,
+            WithdrawDateArray: dateArray,
+            countAmountArray: amount
+        });
+
+    } catch (error) {
+        console.log("Error Generated While Admin Access Route to Create Statistics for Withdrawal-Request Amount Approved");
+        console.log(error);
+        res.send({
+            type: 'error',
+            message: error
         });
     }
 };
