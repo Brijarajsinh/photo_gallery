@@ -72,7 +72,7 @@ exports.getWithdrawRequestAdminSide = async (req, res) => {
             response['layout'] = 'blank';
             response['search'] = search;
         }
-
+        console.log(response.search);
         res.render('admin/withdraw', response);
     } catch (error) {
         console.log("Error Generated In rendering Withdraw Page");

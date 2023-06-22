@@ -40,10 +40,8 @@
                                                 <div class="nav-item dropdown card-body float-left">
                                                     <label for="filtering">Filter Requests By
                                                         Date:</label>
-                                                    <input type="datetime-local" class="start-date-request" value={{#if
-                                                        search.from}}{{search.from}}{{else}}"{{from}}"{{/if}} />
-                                                    <input type="datetime-local" class="end-date-request" value={{#if
-                                                        search.to}}{{search.to}}{{else}}"{{to}}"{{/if}} />
+                                                    <input type="text" class="date-picker-withdraw-request"
+                                                        value="{{#if search}}{{search.from}} - {{search.to}}{{/if}}" />
                                                 </div>
                                             </th>
                                             <th>
@@ -94,7 +92,8 @@
                                             class="table table-striped table-bordered">
                                             <thead>
                                                 <tr role="row">
-                                                    <th class="sort-request" value="userId" data-flag="ASC" id="sort-userId">
+                                                    <th class="sort-request" value="userId" data-flag="ASC"
+                                                        id="sort-userId">
                                                         Requested By<i class="fa fa-sort float-right"></i></th>
                                                     <th class="sort-request createdOn" value="createdOn" data-flag="ASC"
                                                         id="sort-createdOn">

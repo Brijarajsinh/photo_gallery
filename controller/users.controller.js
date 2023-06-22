@@ -1,6 +1,7 @@
 //requiring model to work with collection of that models
 const userModel = require('../schema/userSchema');
 const transactionModel = require('../schema/transactions');
+const moment = require('moment');
 
 const commonFunction = require('../helpers/function');
 const passport = require('passport');
@@ -120,9 +121,8 @@ exports.checkEmail = async (req, res) => {
     return res.send(true);
 }
 
-
 //getTransactions function gets all transactions of logged-in user
-exports.getTransactions = async (req, res, next) => {
+exports.getTransactions = async (req, res) => {
     try {
 
         //if user wants to move to specific page than that page count which is passed in query parameter
@@ -150,7 +150,7 @@ exports.getTransactions = async (req, res, next) => {
         //generates pages by dividing total users displayed in one page
         const pageCount = Math.ceil(totalEntry / limit);
         const page = await commonFunction.createPagination(pageCount);
-        
+
         const response = {
             title: 'Transactions',
             page: page,
@@ -171,8 +171,76 @@ exports.getTransactions = async (req, res, next) => {
     }
 }
 
+//prepareTransactionStatistics function prepares array for transaction statistics
+exports.prepareTransactionStatistics = async (req, res) => {
+    try {
+        //if range passed in query than get that 
+        //otherwise range is upto last 7 day from current day
+        const start = req.query.from ? req.query.from : moment(Date.now()).subtract(15, 'd').format('yyyy-MM-DD');
+        const end = req.query.to ? req.query.to : moment(Date.now()).format('yyyy-MM-DD');
+
+        //creating searchObj which is passed in response to set filtered value is selected
+        const searchObj = {
+            from: start,
+            to: end
+        };
+        const condition = {
+            userId: req.user._id,
+            createdOn: {
+                $gte: new Date(moment(start).utc()),
+                $lt: new Date(moment(end).utc())
+            }
+        };
+        const expenses = await transactionModel.aggregate([
+            {
+                $match: condition
+            },
+            {
+                $group: {
+                    _id: {
+                        'status': '$status',
+                        'type': '$type'
+                    },
+                    amount: {
+                        $sum: "$amount"
+                    }
+                }
+            },
+        ]);
+        const creditLabel = [];
+        const debitLabel = [];
+        const creditData = [];
+        const debitData = [];
+        for (let index of expenses) {
+            if (index._id.status == 'credit') {
+                creditLabel.push(index._id.type);
+                creditData.push(index.amount)
+            }
+            if (index._id.status == 'debit') {
+                debitLabel.push(index._id.type);
+                debitData.push(index.amount)
+            }
+        }
+        res.send({
+            type: 'success',
+            search: searchObj,
+            creditLabel: creditLabel,
+            debitLabel: debitLabel,
+            creditAmount: creditData,
+            debitAmount: debitData
+        });
+    } catch (error) {
+        console.log("Error generated While Logged-in user creates transaction graph");
+        console.log(error);
+        res.send({
+            type: 'error',
+            message: error.toString()
+        });
+    }
+}
+
 //if logged-in user try to access sign-up or login page than
-function _isLoggedIn(req, res, next) {
+function _isLoggedIn(req, res) {
     if (req.user) {
         //redirect to dashboard page
         return res.redirect('/dashboard');

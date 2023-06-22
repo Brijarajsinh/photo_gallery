@@ -12,14 +12,27 @@ const galleryHandler = (function () {
 
         //clear searching and filtering
         clearEventHandler();
+
+        const today = moment(new Date()).format('YYYY-MM-DD');
+        $(".date-picker-gallery-user").daterangepicker({
+            startDate: moment().subtract(6, 'day'),
+            maxDate: today,
+            locale: {
+                format: 'YYYY-MM-DD'
+            },
+        });
+
     };
 
     //getUrl function creates url to call route with query parameters of search and page number in image table
     getUrl = function (sort, sortOrder, page) {
         const url = new URL(location);
         const search = $(".search-cost").val().trim();
-        const startDate = $(".start-date").val();
-        const endDate = $(".end-date").val();
+
+        const date = $(".date-picker-gallery-user").val().split(' - ');
+
+        const startDate = date[0];
+        const endDate = date[1];
         //if logged-in user search image by charge than pass user entered value in search parameter of query string 
         if (search) {
             url.searchParams.set("charge", `${search}`);

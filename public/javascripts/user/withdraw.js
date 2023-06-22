@@ -21,6 +21,15 @@ const withdrawRequestHandler = (function () {
 
         //user will view reason of rejected request by admin
         viewDescriptionEventHandler();
+
+        const today = moment(new Date()).format('YYYY-MM-DD');
+        $(".date-picker-withdraw-request-user").daterangepicker({
+            startDate: moment().subtract(6, 'day'),
+            maxDate: today,
+            locale: {
+                format: 'YYYY-MM-DD'
+            },
+        });
     };
 
     withdrawCoinHandler = function () {
@@ -205,8 +214,11 @@ const withdrawRequestHandler = (function () {
 
     getUrl = function (sort, sortOrder, page) {
         const url = new URL(location);
-        const startDate = $(".start-date").val();
-        const endDate = $(".end-date").val();
+        const date = $(".date-picker-withdraw-request-user").val().split(' - ');
+
+
+        const startDate = date[0];
+        const endDate = date[1];
         const filter = $('.filter-request-status').val();
         //if user sorts the table contents than sorting field passed in query parameter
         if (sort) url.searchParams.set("sort", `${sort}`);

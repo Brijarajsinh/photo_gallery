@@ -18,6 +18,15 @@ const withdrawRequestHandler = (function () {
 
         //clear searching and filtering
         clearEventHandler();
+
+        const today = moment(new Date()).format('YYYY-MM-DD');
+        $(".date-picker-withdraw-request").daterangepicker({
+            startDate: moment().subtract(6, 'day'),
+            maxDate: today,
+            locale: {
+                format: 'YYYY-MM-DD'
+            },
+        });
     };
 
     approveRequestEventHandler = function () {
@@ -181,8 +190,10 @@ const withdrawRequestHandler = (function () {
     getUrl = function (sort, sortOrder, page) {
 
         const url = new URL(location);
-        const startDate = $(".start-date-request").val();
-        const endDate = $(".end-date-request").val();
+        const date = $(".date-picker-withdraw-request").val().split(' - ');
+
+        const startDate = date[0];
+        const endDate = date[1];
         const filter = $('.filter-request').val();
         const user = $(".filter-user").val();
 

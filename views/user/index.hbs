@@ -16,9 +16,31 @@
         </div>
     </div>
 </div>
-<h2 class="ml-1">Refer Link<br>
+<h4 class="ml-1 mb-2">Refer Link<br>
     <input type="text" class="w-50 referral-link" value="http://localhost:3000/sign-up?referral={{user.referLink}}"
         readonly />
-    <input type="button" value="Copy Link" class="mt-1 btn-primary copy-referral-link"/>
-</h2>
-<script src="/javascripts/user/index.js"></script>
+    <input type="button" value="Copy Link" class="mt-1 btn-primary copy-referral-link" />
+</h4><br>
+<div class="ml-1 w-50 nav-item dropdown">
+    <label for="filtering">Filter Transaction's Graph By Date</label>
+    <input type="text" class="date-picker-transaction-graph" />
+    <input type="button" class="btn-primary apply-transaction-statistics" value="Apply" id="transaction-graph" />
+    <input type="button" class="btn-danger clear-transaction-graph" value="Clear" />
+</div><br>
+<div class="col-lg-6">
+    <div class="card">
+        <div class="card-body">
+            <h4 class="mb-3">Credit-Transaction's Statistics</h4>
+            <canvas id="credit-transaction-chart"></canvas>
+        </div>
+    </div>
+</div><!-- /# column -->
+<div class="col-lg-6">
+    <div class="card">
+        <div class="card-body">
+            <h4 class="mb-3">Debit-Transaction's Statistics</h4>
+            <canvas id="debit-transaction-chart"></canvas>
+        </div>
+    </div>
+</div><!-- /# column -->
+<script src="/javascripts/user/dashboard.js"></script>

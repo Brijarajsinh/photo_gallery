@@ -25,7 +25,7 @@ const adminDashboardHandler = function () {
 
     bindUserRegistrationFilterEvent = function () {
         $(document).off('click', '.apply-registered-users-statistics').on('click', '.apply-registered-users-statistics', function () {
-            const datePicked = $('.date-picker-user-graph').val()
+            const datePicked = $('.date-picker-user-graph').val();
             _this.prepareUserRegistrationStatistics(datePicked);
         });
     }
@@ -44,7 +44,6 @@ const adminDashboardHandler = function () {
         $.ajax({
             type: "get",
             url: url,
-            async: false,
             success: function (res) {
                 if (res.type == 'success') {
                     _this.loadApprovedRequestChart(res.WithdrawDateArray, res.countAmountArray);
@@ -68,7 +67,6 @@ const adminDashboardHandler = function () {
         $.ajax({
             type: "get",
             url: url,
-            async: false,
             success: function (res) {
                 if (res.type == 'success') {
                     _this.loadUserRegistrationChart(res.dateArray, res.countUserArray);
@@ -91,11 +89,12 @@ const adminDashboardHandler = function () {
             data: {
                 labels: xValues,
                 datasets: [{
+                    label: 'Registered Users',
                     data: yValues
                 }]
             },
             options: {
-                legend: { display: false },
+                legend: { display: true },
                 title: {
                     display: true,
                     text: "User Registered in Photo Gallery Affiliate Marketing"
@@ -110,6 +109,7 @@ const adminDashboardHandler = function () {
             data: {
                 labels: xValues,
                 datasets: [{
+                    label: 'Approved Withdrawal Requests',
                     data: yValues
                 }]
             },
@@ -122,26 +122,10 @@ const adminDashboardHandler = function () {
             }
         });
     }
-
     this.initialize();
     const _this = this;
 };
 $(function () {
-    const today = moment(new Date()).format('YYYY-MM-DD');
-    $(".date-picker-user-graph").daterangepicker({
-        startDate: moment().subtract(6, 'day'),
-        endDate: today,
-        locale: {
-            format: 'YYYY-MM-DD'
-        },
-    });
-    $(".date-picker-approved-request-graph").daterangepicker({
-        startDate: moment().subtract(6, 'day'),
-        endDate: today,
-        locale: {
-            format: 'YYYY-MM-DD'
-        }
-    });
     const dashboardObj = new adminDashboardHandler();
     dashboardObj.prepareUserRegistrationStatistics();
     dashboardObj.prepareApprovedRequestStatistics();
